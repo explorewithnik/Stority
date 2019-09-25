@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black">
+
+        <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent">
+
+            <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?android:attr/actionBarSize"
+                    app:navigationIcon="@drawable/ic_keyboard_backspace_black_24dp" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <ImageView
+                android:id="@+id/imageview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/info_image"
+                android:scaleType="fitCenter" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/save_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/remark"
+                android:layout_margin="@dimen/fab_margin"
+                app:layout_anchor="@id/remark"
+                app:layout_anchorGravity="end|top"
+                app:srcCompat="@drawable/avd_check" />
+
+        <EditText
+                android:id="@+id/remark"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@color/translucent"
+                android:hint="@string/image_remark"
+                android:inputType="text"
+                android:padding="@dimen/padding_empty_text"
+                android:textColorHint="@android:color/secondary_text_dark"
+                android:textColor="@android:color/white"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

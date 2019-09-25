@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">Stority</string>
+    <string name= "filled_bullet"> \u25CF</string>
+
+    <string name="tap_preview_message">Tap on the preview to focus</string>
+    <string name="generalError">Oops something went wrong. Try again.</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="unexpectedError">An unexpected error occurred.</string>
+    <string name="noMemory">No space available to store the image.</string>
+    <string name="no_camera_warning">No camera on this device</string>
+    <string name="need_camera_permissions">Need Camera Permissions</string>
+    <string name="camera_permission_description">This app needs camera for capturing image</string>
+    <string name="grant">Grant</string>
+    <string name="go_to_grant_permissions">Go to permissions to grant camera, phone, storage, audio and location permissions.</string>
+    <string name="unable_to_get_permission">Unable to get Permission</string>
+    <string name="cancel">Cancel</string>
+    <string name="imageSaveFailed">Image save failed</string>
+    <string name="info_image">Information ImageView</string>
+    <string name="image_remark">Add a remark…</string>
+    <string name="take_pic">Take Picture</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="enter_full_name">Enter full name</string>
+    <string name="enter_phone_number">Enter phone Number</string>
+    <string name="enter_email">Enter email</string>
+    <string name="enter_address">Enter address</string>
+    <string name="submit">Submit</string>
+    <string name="continue_txt">Continue</string>
+    <string name="take_five_pic">Please take 5 pictures.</string>
+    <string name="clicked_all_pic">Did you clicked all 5 pictures ?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="any_lag">Do you feel any lag, screen freeze or black screen while capturing image?</string>
+    <string name="comment_any_issue">Comment (if any other issues occur)</string>
+    <string name="comment">Comment</string>
+    <string name="confirmation">Confirmation</string>
+    <string name="want_to_submit">Do you want to submit it ?</string>
+    <string name="try_after_some_time">Sorry for inconvenience, Please try after some time.</string>
+    <string name="no_image_found_message">No Image Found, Please click another image.</string>
+    <string name="search">Search</string>
+    <string name="home_space">Home Space</string>
+</resources>

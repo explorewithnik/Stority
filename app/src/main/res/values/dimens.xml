@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="fourteen_margin">14dp</dimen>
+    <dimen name="activity_margin_mid">12dp</dimen>
+    <dimen name="activity_horizontal_margin_small">8dp</dimen>
+    <dimen name="activity_horizontal_margin_extra_small">4dp</dimen>
+    <dimen name="activity_horizontal_margin_large">32dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="padding_empty_text">16dp</dimen>
+    <dimen name="activity_horizontal_margin_normal">24dp</dimen>
+    <dimen name="avatar_area">56dp</dimen>
+    <dimen name="icon_size">48dp</dimen>
+    <dimen name="logo_size">72dp</dimen>
+    <dimen name="logo_size_large">96dp</dimen>
+    <dimen name="button_size">16sp</dimen>
+    <dimen name="badge_size">20sp</dimen>
+    <dimen name="badge_text_size">12sp</dimen>
+
+
+</resources>

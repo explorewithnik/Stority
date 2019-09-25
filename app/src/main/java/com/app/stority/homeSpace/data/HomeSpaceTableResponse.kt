@@ -1,0 +1,15 @@
+package com.app.stority.homeSpace.data
+
+import com.google.gson.annotations.SerializedName
+
+data class HomeSpaceTableResponse(
+
+    @field:SerializedName("data")
+    val homeSpaceTable: HomeSpaceTable? = null,
+
+    @field:SerializedName("status")
+    val status: String? = null,
+
+    @field:SerializedName("statusCode")
+    val statusCode: Int? = null
+)

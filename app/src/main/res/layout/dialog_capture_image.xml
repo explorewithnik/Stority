@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_round_corner">
+
+        <TextView
+                android:id="@+id/title_text_view"
+                style="@style/TextAppearance.MaterialComponents.Headline6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin_normal"
+                app:fontFamily="@font/roboto"
+                android:text="@string/take_pic"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/camera_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintBottom_toTopOf="@id/gallery_container"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/title_text_view">
+
+            <ImageView
+                    android:id="@+id/camera_image_view"
+                    android:layout_width="@dimen/avatar_area"
+                    android:layout_height="@dimen/avatar_area"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin_normal"
+                    android:contentDescription="@string/camera"
+                    android:padding="@dimen/activity_horizontal_margin_small"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/camera_text_view"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/avd_camera"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin_normal" />
+
+            <TextView
+                    android:id="@+id/camera_text_view"
+                    style="@style/TextAppearance.MaterialComponents.Body1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    app:fontFamily="@font/roboto"
+                    android:text="@string/camera"
+                    app:layout_constraintBottom_toBottomOf="@id/camera_image_view"
+                    app:layout_constraintStart_toEndOf="@id/camera_image_view"
+                    app:layout_constraintTop_toTopOf="@id/camera_image_view"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin_small" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/gallery_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginBottom="@dimen/activity_horizontal_margin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/camera_container"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:targetApi="m">
+
+            <ImageView
+                    android:id="@+id/gallery_image_view"
+                    android:layout_width="@dimen/avatar_area"
+                    android:layout_height="@dimen/avatar_area"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin_normal"
+                    android:contentDescription="@string/camera"
+                    android:padding="@dimen/activity_horizontal_margin_small"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/gallery_text_view"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/avd_gallery"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin_normal" />
+
+            <TextView
+                    android:id="@+id/gallery_text_view"
+                    style="@style/TextAppearance.MaterialComponents.Body1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    app:fontFamily="@font/roboto"
+                    android:text="@string/gallery"
+                    app:layout_constraintBottom_toBottomOf="@id/gallery_image_view"
+                    app:layout_constraintStart_toEndOf="@id/gallery_image_view"
+                    app:layout_constraintTop_toTopOf="@id/gallery_image_view"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

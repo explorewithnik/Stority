@@ -1,0 +1,145 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'jacoco'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'androidx.navigation.safeargs'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
+    defaultConfig {
+        applicationId "com.app.stority"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        dataBinding.enabled = true
+        multiDexEnabled true
+
+        useLibrary 'org.apache.http.legacy'
+
+        packagingOptions {
+            exclude 'LICENSE.txt'
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/INDEX.LIST'
+        }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation":
+                                     "$projectDir/schemas".toString()]
+            }
+        }
+
+        androidExtensions {
+            experimental = true
+        }
+
+        vectorDrawables.useSupportLibrary = true
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            buildConfigField 'String', "primaryBaseUrl", debug_base_url
+            // Run code coverage reports by default on debug builds
+            testCoverageEnabled = false
+        }
+
+        release {
+            minifyEnabled false
+            buildConfigField 'String', "primaryBaseUrl", release_base_url
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // crashlytics dependency
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.8@aar') {
+        transitive = true
+    }
+
+    // kotlin
+    implementation deps.kotlin.stdlib
+
+    // androidx views dependency
+    implementation deps.support.app_compat
+    implementation deps.support.app_compat_resources
+    implementation deps.support.recyclerview
+    implementation deps.support.cardview
+    implementation deps.support.constraint_layout
+    implementation deps.support.multidex
+    implementation deps.support.annotations
+    implementation deps.support.exif_interface
+    implementation deps.support.core_utils
+    implementation deps.support.core_utils_ktx
+
+    // material design dependency
+    implementation deps.material
+
+    // room dependency
+    implementation deps.room.runtime
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0'
+    kapt(deps.room.compiler, {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    // lifecycle dependency
+    implementation deps.lifecycle.runtime
+    implementation deps.lifecycle.extensions
+    implementation deps.lifecycle.java8
+    implementation deps.lifecycle.viewModel
+    kapt deps.lifecycle.compiler
+
+    // retrofit dependency
+    implementation deps.retrofit.runtime
+    implementation deps.retrofit.gson
+
+
+    // dagger dependency
+    implementation deps.dagger.runtime
+    implementation deps.dagger.android
+    implementation deps.dagger.android_support
+    kapt deps.dagger.android_support_compiler
+    kapt deps.dagger.compiler
+
+    // navigation dependency
+    implementation deps.navigation.fragment_ktx
+
+    // play dependency
+    implementation deps.play.runtime
+
+    // mime dependency
+    implementation deps.http_mime
+
+    // gson dependency
+    implementation deps.gson
+
+    // glide dependency
+    implementation deps.glide
+
+    // lottie dependency
+    implementation deps.lottie
+
+    // Android Debug dependency
+    debugImplementation deps.debug_implementation
+
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
+
+

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+                name="imageUrl"
+                type="String" />
+
+        <variable
+                name="currentImage"
+                type="Integer" />
+
+        <variable
+                name="totalImage"
+                type="Integer" />
+
+        <variable
+                name="shouldVisible"
+                type="Boolean" />
+
+        <import type="android.view.View" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            tools:context=".displayImage.DisplayFragment">
+
+        <com.app.stority.widget.ZoomageView
+                android:id="@+id/imageView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:imageUrl="@{imageUrl}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:zoomage_animateOnReset="false"
+                app:zoomage_autoCenter="true"
+                app:zoomage_autoResetMode="NEVER"
+                app:zoomage_restrictBounds="false"
+                app:zoomage_translatable="true"
+                app:zoomage_zoomable="true" />
+
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/translucent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:navigationIcon="@drawable/ic_keyboard_backspace_black_24dp"/>
+
+        <View
+                android:id="@+id/view"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                app:visibility="@{safeUnbox(shouldVisible)}"
+                android:background="@color/translucent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+                android:id="@+id/countText"
+                style="@style/Base.TextAppearance.AppCompat.Headline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{String.valueOf(safeUnbox(currentImage))+'/'+String.valueOf(safeUnbox(totalImage))}"
+                android:textColor="@color/white"
+                app:visibility="@{safeUnbox(shouldVisible)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/view"
+                tools:text="1/5" />
+
+        <ImageView
+                android:id="@+id/prev"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:tint="@color/white"
+                app:srcCompat="@drawable/ic_navigate_before_black_24dp"
+                android:padding="@dimen/activity_horizontal_margin_extra_small"
+                android:visibility="@{!safeUnbox(shouldVisible) ? View.INVISIBLE : (safeUnbox(currentImage)==1 ? View.INVISIBLE : View.VISIBLE)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/countText"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="@id/countText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/view" />
+
+        <ImageView
+                android:id="@+id/next"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="@dimen/activity_horizontal_margin_extra_small"
+                android:tint="@color/white"
+                app:srcCompat="@drawable/ic_navigate_next_black_24dp"
+                android:visibility="@{!safeUnbox(shouldVisible) ? View.INVISIBLE : (safeUnbox(currentImage)==safeUnbox(currentImage) ? View.INVISIBLE : View.VISIBLE)}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toLeftOf="@id/countText"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="@id/countText"
+                app:layout_constraintTop_toTopOf="@id/view" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
