@@ -31,8 +31,6 @@
         android:layout_height="match_parent"
         tool:context=".homeSpace.owner.activity.HomeSpaceActivity">
 
-
-
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,15 +45,15 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_scrollFlags="scroll|enterAlways" />
 
-        </com.google.android.material.appbar.AppBarLayout>
+            <include
+                android:id="@+id/progress"
+                layout="@layout/view_progressbar"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                app:resource="@{resource}" />
 
-        <include
-            android:id="@+id/progress"
-            layout="@layout/view_progressbar"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/toolbar"
-            app:resource="@{resource}" />
+        </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"

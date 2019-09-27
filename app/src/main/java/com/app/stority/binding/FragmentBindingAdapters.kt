@@ -12,6 +12,7 @@ import com.app.stority.R
 import com.app.stority.displayImage.ImageViewerActivity
 import com.app.stority.helper.CameraUtils.checkCameraHardware
 import com.app.stority.helper.CameraUtils.getInternalStorageSize
+import com.app.stority.widget.AddDataDailog
 import com.app.stority.widget.TakePictureDialog
 import com.bumptech.glide.Glide
 import javax.inject.Inject
@@ -40,7 +41,8 @@ class FragmentBindingAdapters @Inject constructor(val fragment: Fragment) {
             override fun onCameraClick() {
                 openCamera(
                     context,
-                    cameraCode ?: throw Exception("Camera code should be specified in view binding")
+                    cameraCode
+                        ?: throw Exception("Camera code should be specified in view binding")
                 )
             }
 
@@ -82,4 +84,32 @@ class FragmentBindingAdapters @Inject constructor(val fragment: Fragment) {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         fragment.startActivityForResult(intent, code)
     }
+
+    @BindingAdapter(value = ["addDialog"], requireAll = true)
+    fun showDialog(view: View,show: Boolean) {
+        val context = view.context
+        val dialog = AddDataDailog(context, object : AddDataDailog.DialogEventTriggerListner {
+
+            override fun saveData(text: String) {
+                saveDataFromDialog(
+                    context,
+                    text
+                )
+            }
+
+            override fun cancel() {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+        })
+
+        view.setOnClickListener {
+            dialog.show()
+        }
+    }
+
+    fun saveDataFromDialog(context: Context, text: String) {
+
+    }
+
 }

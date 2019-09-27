@@ -28,21 +28,17 @@
         <item name="android:background">@drawable/background_round_corner</item>
     </style>
 
-    <style name="AppBaseTheme" parent="android:Theme.Light"/>
+    <style name="AppBaseTheme" parent="android:Theme.Light" />
+
     <style name="SecondAppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
     <style name="MTRLThemeLight" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/my_app_color_on_surface</item>
-        <item name="colorPrimaryDark">@color/my_app_color_on_surface</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="android:windowBackground">@color/green_glass</item>
+        <item name="colorPrimaryDark">@color/white</item>
         <item name="colorAccent">@color/green_glass</item>
-    </style>
-
-    <style name="ThemeLight" parent="MTRLThemeLight">
-        <item name="colorPrimary">@color/my_app_surface_color</item>
-        <item name="colorPrimaryDark">@color/my_app_color_on_surface</item>
-        <item name="colorAccent">@color/my_app_surface_color</item>
     </style>
 
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
