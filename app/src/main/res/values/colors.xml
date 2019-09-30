@@ -1,30 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="my_app_primary_color">#6200EE</color>
-    <color name="my_app_primary_variant_color">#3700B3</color>
-    <color name="my_app_secondary_color">#03DAC6</color>
-    <color name="my_app_secondary_variant_color">#018786</color>
-    <color name="my_app_background_color">#000000</color>
-    <color name="my_app_error_color">#B00020</color>
-    <color name="my_app_surface_color">#FFFFFF</color>
-    <color name="my_app_color_on_surface">#000000</color>
-    <color name="my_app_color_on_primary">#FFFFFF</color>
-    <color name="my_app_color_on_secondary">#000000</color>
-    <color name="my_app_color_on_error">#FFFFFF</color>
-    <color name="my_app_color_on_background">#000000</color>
-    <color name="black">#000000</color>
+    <color name="black">#1C1817</color>
     <color name="red">#e05050</color>
-    <color name="white">#FFFFFF</color>
+    <color name="white">#F9F8F4</color>
     <color name="grey_dark">#7A808080</color>
     <color name="dark_gray">#4f4f40</color>
     <color name="translucent">#3f202020</color>
     <color name="transparent">#00202020</color>
-    <color name="green_glass">#A9DFBF</color>
-    <color name="green_glass_dark">#72D8A7</color>
-    <color name="dark_green_glass">#7e9a81</color>
     <color name="color_divider">#B3B3B3</color>
-    <color name="light_color">#B7000000</color>
-    <color name="secondary_variant">#018786</color>
-    <color name="secondary">#03DAC6</color>
+    <color name="light_color">#1C1817</color>
+    <color name="app_theme_color">#F1EDEA</color>
+    <color name="app_theme_color_secondary">#E8E8E0</color>
+    <color name="app_theme_color_accent">#904F3F</color>
 </resources>

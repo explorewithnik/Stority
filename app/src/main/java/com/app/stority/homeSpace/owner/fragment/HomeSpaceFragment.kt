@@ -1,12 +1,8 @@
 package com.app.stority.homeSpace.owner.fragment
 
-import android.content.Context
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.*
-import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -19,14 +15,12 @@ import com.app.stority.binding.FragmentDataBindingComponent
 import com.app.stority.databinding.FragmentHomeSpaceBinding
 import com.app.stority.di.Injectable
 import com.app.stority.helper.AppExecutors
-import com.app.stority.helper.Logger
 import com.app.stority.helper.autoCleared
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.observer.HomeSpaceViewModel
 import com.app.stority.homeSpace.owner.adapter.HomeSpaceAdapter
 import com.app.stority.remoteUtils.Status
 import com.app.stority.widget.AddDataDailog
-import com.google.gson.Gson
 import javax.inject.Inject
 
 
@@ -54,6 +48,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
         ) { data, action ->
             when (action) {
                 "item" -> {
+
                 }
             }
         }
@@ -119,6 +114,10 @@ class HomeSpaceFragment : Fragment(), Injectable {
             dataBindingComponent
         )
 
+        binding.fab.setOnClickListener {
+            onActionCallback(HomeSpaceTable(), ACTION_NEW)
+        }
+
         return binding.root
     }
 
@@ -154,10 +153,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
             R.id.menuSearch -> {
 
             }
-
-            R.id.menuAdd -> {
-                onActionCallback(HomeSpaceTable(), ACTION_NEW)
-            }
         }
         return true
     }
@@ -183,6 +178,5 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
     private fun onSaveCallback(data: HomeSpaceTable, action: Int) {
         viewModel.insertCategory(data)
-        Logger.e(Thread.currentThread(), "data ${Gson().toJson(data)}")
     }
 }

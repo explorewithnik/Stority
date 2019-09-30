@@ -9,11 +9,4 @@
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:title="@string/add_menu_title"
-        android:id="@+id/menuAdd"
-        android:icon="@drawable/ic_add_black_24dp"
-        android:orderInCategory="101"
-        app:showAsAction="always" />
-
 </menu>

@@ -45,4 +45,29 @@
     <string name="save_button">save</string>
     <string name="add_button">ADD</string>
     <string name="enter_category_name_error">Enter $ </string>
+
+
+    <!--date_time_format-->
+    <string name="day_date_format">EEEE, MMM dd yyyy</string>
+    <string name="custom_date">MMM dd, hh:mm aa</string>
+    <string name="date_format_past">MMM dd, hh:mm aa</string>
+    <string name="day_format_long">EEEE, MMMM dd, yyyy</string>
+    <string name="time_format">hh:mm aa</string>
+    <string name="hour_min_full">HH:mm</string>
+    <string name="date_time_format">EEEE, MMM dd, yyyy hh:mm aa</string>
+    <string name="simple_date">dd/MM/yyyy</string>
+    <string name="simple_date_time">dd/MM/yyyy hh:mm a</string>
+    <string name="week_lower_only">week</string>
+    <string name="empty_date">--/--</string>
+    <string name="amount_only">Amount</string>
+    <string name="expense_file_title">IDS KISAN NETWORK (P) LTD</string>
+    <string name="patti_file_title">Patti/Purchase Note</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="uploading_only">Uploading…</string>
+    <string name="day_date_time_short">EEE, MMM dd, yyyy hh:mm aa</string>
+    <string name="day_date_short">EEE, MMM dd, yyyy</string>
+    <string name="full_time_format">hh:mm aa dd,MMM,yyyy</string>
+    <string name="date_month_in_word">dd-MMM-yyyy</string>
+    <string name="empty_text">--/--</string>
+    <string name="month_date_format">MMMM dd</string>
 </resources>
