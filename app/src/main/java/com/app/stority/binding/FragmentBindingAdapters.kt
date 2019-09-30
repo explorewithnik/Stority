@@ -85,31 +85,4 @@ class FragmentBindingAdapters @Inject constructor(val fragment: Fragment) {
         fragment.startActivityForResult(intent, code)
     }
 
-    @BindingAdapter(value = ["addDialog"], requireAll = true)
-    fun showDialog(view: View,show: Boolean) {
-        val context = view.context
-        val dialog = AddDataDailog(context, object : AddDataDailog.DialogEventTriggerListner {
-
-            override fun saveData(text: String) {
-                saveDataFromDialog(
-                    context,
-                    text
-                )
-            }
-
-            override fun cancel() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-        })
-
-        view.setOnClickListener {
-            dialog.show()
-        }
     }
-
-    fun saveDataFromDialog(context: Context, text: String) {
-
-    }
-
-}

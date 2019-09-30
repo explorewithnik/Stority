@@ -4,50 +4,43 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.WindowManager
+import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import com.app.stority.R
 import com.app.stority.databinding.DialogAddDataBinding
+import com.app.stority.homeSpace.data.HomeSpaceTable
 
 
 class AddDataDailog(
-    context: Context,
-    private val listener: DialogEventTriggerListner
-) : Dialog(context, R.style.BaseDialogTheme) {
-
-    private lateinit var binding: DialogAddDataBinding
+    @get:JvmName("getContext_") val context: Context,
+    private var data: HomeSpaceTable = HomeSpaceTable(),
+    private val action: Int,
+    private var dataBindingComponent: DataBindingComponent,
+    private val onSaveCallback: ((HomeSpaceTable, Int) -> Unit)
+) : Dialog(context, R.style.EditTextDialog) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.inflate(
+        DataBindingUtil.inflate<DialogAddDataBinding>(
             LayoutInflater.from(context),
             R.layout.dialog_add_data,
             null,
-            false
-        )
-        setContentView(binding.root)
-
-        window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-
-        binding.let {
-
-            it.saveButton.setOnClickListener { view ->
-                listener.saveData(it.categoryEt.text.toString())
-                dismiss()
+            false,
+            dataBindingComponent
+        ).also { bind ->
+            setContentView(bind.root)
+            bind.data = data
+            bind.saveButton.setOnClickListener {
+                bind?.data?.let {
+                    onSaveCallback.invoke(data, action)
+                    this.dismiss()
+                }
             }
-
-            it.cancelButton.setOnClickListener {
-                listener.cancel()
-                dismiss()
+            bind.cancelButton.setOnClickListener {
+                this.dismiss()
             }
         }
     }
 
-    interface DialogEventTriggerListner {
-        fun saveData(text: String)
-        fun cancel()
-    }
+
 }

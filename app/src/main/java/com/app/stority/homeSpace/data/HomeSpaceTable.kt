@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "HomeSpaceTable")
 data class HomeSpaceTable(
+
     @PrimaryKey(autoGenerate = true)
     @field:SerializedName("id")
     var id: Int = 0,

@@ -61,7 +61,7 @@ class HomeSpaceRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun insertInspectionDataWithImages(data: HomeSpaceTable) = executor.diskIO().execute { dao.insertHomeSpaceData(data = data) }
+    fun insertCategoryData(data: HomeSpaceTable) = executor.diskIO().execute { dao.insertHomeSpaceData(data = data) }
 
     fun deleteHomeSpaceAllData() = executor.diskIO().execute { dao.deleteHomeSpaceAllData() }
 

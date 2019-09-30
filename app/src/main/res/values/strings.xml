@@ -13,7 +13,7 @@
     <string name="grant">Grant</string>
     <string name="go_to_grant_permissions">Go to permissions to grant camera, phone, storage, audio and location permissions.</string>
     <string name="unable_to_get_permission">Unable to get Permission</string>
-    <string name="cancel">Cancel</string>
+    <string name="cancel">CANCEL</string>
     <string name="imageSaveFailed">Image save failed</string>
     <string name="info_image">Information ImageView</string>
     <string name="image_remark">Add a remark…</string>
@@ -43,4 +43,6 @@
     <string name="add_data_dialog_title">New Category</string>
     <string name="add_a_category">Add a category</string>
     <string name="save_button">save</string>
+    <string name="add_button">ADD</string>
+    <string name="enter_category_name_error">Enter $ </string>
 </resources>

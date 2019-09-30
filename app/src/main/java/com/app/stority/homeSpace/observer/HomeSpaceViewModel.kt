@@ -55,4 +55,11 @@ class HomeSpaceViewModel @Inject constructor(
     fun deleteHomeSpaceData(data: HomeSpaceTable?) {
         repo.deleteHomeSpaceData(data = data)
     }
+
+    fun insertCategory(data: HomeSpaceTable) {
+        repo.insertCategoryData(data)
+
+    }
+
+
 }
