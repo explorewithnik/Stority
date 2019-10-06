@@ -32,6 +32,7 @@ class HomeSpaceAdapter(
     }
 ) {
 
+    private var actionMode: ActionMode? = null
     private var multiSelect = false
     private val selectedItems = ArrayList<HomeSpaceTable>()
     override fun createBinding(parent: ViewGroup): AdapterHomeSpaceBinding {
@@ -54,7 +55,8 @@ class HomeSpaceAdapter(
     }
 
     inner class ActionModeCallback : ActionMode.Callback {
-        var mode: ActionMode? = null
+
+
         override fun onActionItemClicked(
             mode: ActionMode?,
             item: MenuItem?
@@ -68,7 +70,6 @@ class HomeSpaceAdapter(
             mode: ActionMode?,
             menu: Menu?
         ): Boolean {
-            this.mode = mode
             multiSelect = true
             val inflater = mode?.menuInflater
             inflater?.inflate(R.menu.multi_select_menu, menu)
@@ -91,6 +92,7 @@ class HomeSpaceAdapter(
 
     fun update(data: HomeSpaceTable?, binding: AdapterHomeSpaceBinding) {
         if (selectedItems.contains(data)) {
+
             binding.cv.strokeColor = Color.BLACK
             binding.cv.strokeWidth = 2
         } else {
@@ -106,7 +108,7 @@ class HomeSpaceAdapter(
 
         binding.root.setOnLongClickListener {
             val context = it.context as AppCompatActivity
-            context.startSupportActionMode(ActionModeCallback())
+            actionMode = context.startSupportActionMode(ActionModeCallback())
             binding.data?.let { data ->
                 selectItem(data, binding, null)
             }
@@ -116,20 +118,28 @@ class HomeSpaceAdapter(
     }
 
     fun selectItem(
-        data: HomeSpaceTable,
-        binding: AdapterHomeSpaceBinding,
-        action: String?
+        data: HomeSpaceTable, binding: AdapterHomeSpaceBinding, action: String?
     ) {
         if (multiSelect) {
             if (selectedItems.contains(data)) {
                 selectedItems.remove(data)
                 binding.cv.strokeColor = Color.TRANSPARENT
                 binding.cv.strokeWidth = 0
+                if (selectedItems.size == 0) actionMode?.finish()
+
             } else {
                 selectedItems.add(data)
                 binding.cv.strokeColor = Color.BLACK
                 binding.cv.strokeWidth = 2
             }
+
+            if (selectedItems.size > 0) {
+                actionMode?.title = selectedItems.size.toString()
+            } else {
+                actionMode?.title = ""
+            }
+
+
         } else {
             when (action) {
                 "item" -> {

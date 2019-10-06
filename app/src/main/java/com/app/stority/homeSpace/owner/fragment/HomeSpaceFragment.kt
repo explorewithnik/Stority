@@ -44,7 +44,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        setUpToolbar()
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(HomeSpaceViewModel::class.java)
 
@@ -65,8 +64,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
                 }
             }
         }
-
-
 
         binding.let {
             it.lifecycleOwner = this
@@ -144,17 +141,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
         setHasOptionsMenu(true)
     }
 
-    private fun setUpToolbar() {
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
-        (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-            setDisplayShowTitleEnabled(true)
-            //setDisplayHomeAsUpEnabled(true)
-            title = getString(R.string.home_space)
-        }
 
-        //binding.toolbar.setNavigationOnClickListener { requireActivity().onBackPressed() }
-
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.home_space_menu, menu)
@@ -167,7 +154,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menuSearch -> {
-
+                Logger.e(Thread.currentThread(), "search")
             }
         }
         return true
