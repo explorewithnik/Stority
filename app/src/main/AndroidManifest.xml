@@ -28,7 +28,6 @@
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/MTRLThemeLight">
         <activity android:name=".homeSpace.owner.activity.HomeSpaceActivity"
-            android:label="@string/home_space"
             android:exported="true"
             >
             <intent-filter>

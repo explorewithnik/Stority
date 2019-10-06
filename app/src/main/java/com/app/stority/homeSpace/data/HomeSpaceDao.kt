@@ -23,6 +23,7 @@ interface HomeSpaceDao {
     @Query("DELETE FROM HomeSpaceTable WHERE id =:id")
     fun deleteHomeSpaceData(id: Int?)
 
+
     @Query("DELETE FROM HomeSpaceTable")
     fun deleteHomeSpaceAllData()
 }

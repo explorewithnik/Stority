@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -52,15 +51,16 @@ class HomeSpaceFragment : Fragment(), Injectable {
         adapter = HomeSpaceAdapter(
             dataBindingComponent = dataBindingComponent,
             appExecutors = executors
-        ) { data, action ->
+        ) { listData, action ->
             when (action) {
 
                 "item" -> {
-                    Logger.e(Thread.currentThread(), "item ${Gson().toJson(data)}")
+                    Logger.e(Thread.currentThread(), "item ${Gson().toJson(listData)}")
                 }
 
                 "delete" -> {
-                    Logger.e(Thread.currentThread(), "delete data ${Gson().toJson(data)}")
+                    Logger.e(Thread.currentThread(), "list ite ${Gson().toJson(listData)}")
+                    viewModel.deleteHomeSpaceListData(list = listData)
                 }
             }
         }
@@ -140,7 +140,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
     }
-
 
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

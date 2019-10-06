@@ -3,6 +3,7 @@ package com.app.stority.homeSpace.repo
 
 import androidx.lifecycle.LiveData
 import com.app.stority.helper.AppExecutors
+import com.app.stority.helper.Logger
 import com.app.stority.homeSpace.data.HomeSpaceDao
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.data.HomeSpaceTableResponse
@@ -10,6 +11,7 @@ import com.app.stority.remoteUtils.ApiResponse
 import com.app.stority.remoteUtils.NetworkBoundResource
 import com.app.stority.remoteUtils.Resource
 import com.app.stority.remoteUtils.WebService
+import com.google.gson.Gson
 
 import javax.inject.Inject
 
@@ -61,12 +63,23 @@ class HomeSpaceRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun insertCategoryData(data: HomeSpaceTable) = executor.diskIO().execute { dao.insertHomeSpaceData(data = data) }
+    fun insertCategoryData(data: HomeSpaceTable) =
+        executor.diskIO().execute { dao.insertHomeSpaceData(data = data) }
 
     fun deleteHomeSpaceAllData() = executor.diskIO().execute { dao.deleteHomeSpaceAllData() }
 
-    fun deleteHomeSpaceData(data: HomeSpaceTable?) = executor.diskIO().execute { dao.deleteHomeSpaceData(id = data?.id) }
+    fun deleteHomeSpaceData(data: HomeSpaceTable?) =
+        executor.diskIO().execute { dao.deleteHomeSpaceData(id = data?.id) }
 
+    fun deleteHomeSpaceDataList(list: List<HomeSpaceTable>?) {
+        list?.forEach {
+            executor.diskIO().execute {
+                Logger.e(Thread.currentThread(), "id ${it.id}")
+                dao.deleteHomeSpaceData(id = it.id)
+            }
+
+        }
+    }
 }
 
 

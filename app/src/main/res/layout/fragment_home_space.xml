@@ -36,6 +36,8 @@
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true">
 
+
+
             <include
                 android:id="@+id/progress"
                 layout="@layout/view_progressbar"

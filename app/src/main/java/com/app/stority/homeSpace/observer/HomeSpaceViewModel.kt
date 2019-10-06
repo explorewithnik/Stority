@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.app.stority.helper.Logger
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.repo.HomeSpaceRepository
 import com.app.stority.remoteUtils.AbsentLiveData
@@ -55,6 +56,12 @@ class HomeSpaceViewModel @Inject constructor(
     fun deleteHomeSpaceData(data: HomeSpaceTable?) {
         repo.deleteHomeSpaceData(data = data)
     }
+
+    fun deleteHomeSpaceListData(list: List<HomeSpaceTable>?) {
+        Logger.e(Thread.currentThread(),"viewmodel list $list")
+        repo.deleteHomeSpaceDataList(list = list)
+    }
+
 
     fun insertCategory(data: HomeSpaceTable) {
         repo.insertCategoryData(data)
