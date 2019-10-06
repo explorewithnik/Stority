@@ -1,7 +1,12 @@
 package com.app.stority.homeSpace.owner.fragment
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context.CLIPBOARD_SERVICE
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
@@ -15,12 +20,15 @@ import com.app.stority.binding.FragmentDataBindingComponent
 import com.app.stority.databinding.FragmentHomeSpaceBinding
 import com.app.stority.di.Injectable
 import com.app.stority.helper.AppExecutors
+import com.app.stority.helper.Logger
 import com.app.stority.helper.autoCleared
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.observer.HomeSpaceViewModel
 import com.app.stority.homeSpace.owner.adapter.HomeSpaceAdapter
 import com.app.stority.remoteUtils.Status
 import com.app.stority.widget.AddDataDailog
+import com.app.stority.widget.MultipleOptionDailog
+import com.google.gson.Gson
 import javax.inject.Inject
 
 
@@ -47,11 +55,19 @@ class HomeSpaceFragment : Fragment(), Injectable {
             appExecutors = executors
         ) { data, action ->
             when (action) {
-                "item" -> {
 
+                "item" -> {
+                    Logger.e(Thread.currentThread(), "item ${Gson().toJson(data)}")
+                }
+
+                "delete" -> {
+                    Logger.e(Thread.currentThread(), "delete data ${Gson().toJson(data)}")
                 }
             }
         }
+
+
+
         binding.let {
             it.lifecycleOwner = this
             it.recycler.adapter = adapter
@@ -160,6 +176,10 @@ class HomeSpaceFragment : Fragment(), Injectable {
     companion object {
         const val ACTION_EDIT = 1
         const val ACTION_NEW = 0
+        const val ACTION_MORE = 2
+        const val ACTION_COPY = "copy"
+        const val ACTION_DELETE = "delete"
+        const val ACTION_SHARE = "share"
     }
 
     private fun onActionCallback(data: HomeSpaceTable, action: Int) {
@@ -173,10 +193,45 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     onSaveCallback = this::onSaveCallback
                 ).show()
             }
+
+            ACTION_MORE -> {
+                MultipleOptionDailog(
+                    context = requireContext(),
+                    data = data,
+                    onMoreActionCalback = this::onMoreActionCallback
+                ).show()
+            }
         }
     }
 
     private fun onSaveCallback(data: HomeSpaceTable, action: Int) {
         viewModel.insertCategory(data)
+    }
+
+    private fun onMoreActionCallback(data: HomeSpaceTable, action: String) {
+        Logger.e(Thread.currentThread(), "data 2 ${Gson().toJson(data)} action $action")
+        when (action) {
+            ACTION_COPY -> {
+                val clipboard =
+                    requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+                val clip = ClipData.newPlainText("label", data.text)
+                clipboard?.setPrimaryClip(clip)
+
+                Toast.makeText(requireContext(), "copied", Toast.LENGTH_SHORT).show()
+            }
+
+            ACTION_DELETE -> {
+                viewModel.deleteHomeSpaceData(data = data)
+            }
+
+            ACTION_SHARE -> {
+                val sharingIntent = Intent(Intent.ACTION_SEND)
+                sharingIntent.type = "text/plain"
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Note")
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, data.text)
+                startActivity(Intent.createChooser(sharingIntent, "Share via"))
+            }
+
+        }
     }
 }

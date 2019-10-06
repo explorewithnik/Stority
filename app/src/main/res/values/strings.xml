@@ -38,6 +38,7 @@
     <string name="try_after_some_time">Sorry for inconvenience, Please try after some time.</string>
     <string name="no_image_found_message">No Image Found, Please click another image.</string>
     <string name="search">Search</string>
+    <string name="delete">Delete</string>
     <string name="add_menu_title">Add</string>
     <string name="home_space">Home Space</string>
     <string name="add_data_dialog_title">New Category</string>

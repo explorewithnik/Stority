@@ -1,7 +1,9 @@
 package com.app.stority.homeSpace.owner.adapter
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import android.graphics.Color
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
@@ -12,11 +14,11 @@ import com.app.stority.helper.DataBoundListAdapter
 import com.app.stority.homeSpace.data.HomeSpaceTable
 
 
-
 class HomeSpaceAdapter(
     private val dataBindingComponent: DataBindingComponent,
     appExecutors: AppExecutors,
-    private val callback: ((HomeSpaceTable, action: String) -> Unit)?
+    private val callback: ((List<HomeSpaceTable>, action: String) -> Unit)?
+
 ) : DataBoundListAdapter<HomeSpaceTable, AdapterHomeSpaceBinding>(
     appExecutors = appExecutors,
     diffCallback = object : DiffUtil.ItemCallback<HomeSpaceTable>() {
@@ -30,6 +32,8 @@ class HomeSpaceAdapter(
     }
 ) {
 
+    private var multiSelect = false
+    private val selectedItems = ArrayList<HomeSpaceTable>()
     override fun createBinding(parent: ViewGroup): AdapterHomeSpaceBinding {
         val binding = DataBindingUtil
             .inflate<AdapterHomeSpaceBinding>(
@@ -46,10 +50,95 @@ class HomeSpaceAdapter(
     override fun bind(binding: AdapterHomeSpaceBinding, item: HomeSpaceTable, position: Int) {
         binding.data = item
 
+        update(binding.data, binding)
+    }
+
+    inner class ActionModeCallback : ActionMode.Callback {
+        var mode: ActionMode? = null
+        override fun onActionItemClicked(
+            mode: ActionMode?,
+            item: MenuItem?
+        ): Boolean {
+            callback?.invoke(selectedItems, "delete")
+            mode?.finish()
+            return true
+        }
+
+        override fun onCreateActionMode(
+            mode: ActionMode?,
+            menu: Menu?
+        ): Boolean {
+            this.mode = mode
+            multiSelect = true
+            val inflater = mode?.menuInflater
+            inflater?.inflate(R.menu.multi_select_menu, menu)
+            return true
+        }
+
+        override fun onPrepareActionMode(
+            mode: ActionMode?,
+            menu: Menu?
+        ): Boolean {
+            return false
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            multiSelect = false
+            selectedItems.clear()
+            notifyDataSetChanged()
+        }
+    }
+
+    fun update(data: HomeSpaceTable?, binding: AdapterHomeSpaceBinding) {
+        if (selectedItems.contains(data)) {
+            binding.cv.strokeColor = Color.BLACK
+            binding.cv.strokeWidth = 2
+        } else {
+            binding.cv.strokeColor = Color.TRANSPARENT
+            binding.cv.strokeWidth = 0
+        }
+
         binding.root.setOnClickListener {
-            binding.data?.let {
-                callback?.invoke(it, "item")
+            binding.data?.let { data ->
+                selectItem(data, binding, "item")
+            }
+        }
+
+        binding.root.setOnLongClickListener {
+            val context = it.context as AppCompatActivity
+            context.startSupportActionMode(ActionModeCallback())
+            binding.data?.let { data ->
+                selectItem(data, binding, null)
+            }
+            return@setOnLongClickListener true
+        }
+
+    }
+
+    fun selectItem(
+        data: HomeSpaceTable,
+        binding: AdapterHomeSpaceBinding,
+        action: String?
+    ) {
+        if (multiSelect) {
+            if (selectedItems.contains(data)) {
+                selectedItems.remove(data)
+                binding.cv.strokeColor = Color.TRANSPARENT
+                binding.cv.strokeWidth = 0
+            } else {
+                selectedItems.add(data)
+                binding.cv.strokeColor = Color.BLACK
+                binding.cv.strokeWidth = 2
+            }
+        } else {
+            when (action) {
+                "item" -> {
+                    callback?.invoke(listOf(data), "item")
+                }
+                null -> {
+                }
             }
         }
     }
+
 }
