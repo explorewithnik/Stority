@@ -32,6 +32,7 @@ class AddDataDailog(
             bind.data = data
             bind.saveButton.setOnClickListener {
                 bind?.data?.let {
+
                     onSaveCallback.invoke(data, action)
                     this.dismiss()
                 }
@@ -39,6 +40,8 @@ class AddDataDailog(
             bind.cancelButton.setOnClickListener {
                 this.dismiss()
             }
+
+            this.setCanceledOnTouchOutside(false)
         }
     }
 

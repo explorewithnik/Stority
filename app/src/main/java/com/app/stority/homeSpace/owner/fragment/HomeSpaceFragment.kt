@@ -203,7 +203,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
     }
 
     private fun onSaveCallback(data: HomeSpaceTable, action: Int) {
-        viewModel.insertCategory(data)
+        if (!data.text.isNullOrBlank()) viewModel.insertCategory(data)
     }
 
     private fun onMoreActionCallback(data: HomeSpaceTable, action: String) {
