@@ -3,9 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:title="@string/delete"
+        android:id="@+id/menuAddAll"
+        android:icon="@drawable/ic_tick_all"
+        android:title="@string/select_all"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/menuRemoveAll"
+        android:icon="@drawable/ic_select_all"
+        android:title="@string/select_all"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/menuDelete"
-        android:icon="@drawable/ic_delete_black_24dp"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/delete"
         app:showAsAction="always" />
 
 </menu>

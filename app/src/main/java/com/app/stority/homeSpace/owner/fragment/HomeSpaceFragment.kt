@@ -49,19 +49,28 @@ class HomeSpaceFragment : Fragment(), Injectable {
         viewModel.init()
 
         adapter = HomeSpaceAdapter(
+            context = requireContext(),
             dataBindingComponent = dataBindingComponent,
             appExecutors = executors
         ) { listData, action ->
             when (action) {
 
-                "item" -> {
+                ACTION_ROOT -> {
                     Logger.e(Thread.currentThread(), "item ${Gson().toJson(listData)}")
                 }
 
-                "delete" -> {
-                    Logger.e(Thread.currentThread(), "list ite ${Gson().toJson(listData)}")
+                ACTION_DELETE -> {
                     viewModel.deleteHomeSpaceListData(list = listData)
                 }
+
+                ACTION_FAB_SHOW -> {
+                    binding.fab.show()
+                }
+
+                ACTION_FAB_HIDE -> {
+                    binding.fab.hide()
+                }
+
             }
         }
 
@@ -166,6 +175,9 @@ class HomeSpaceFragment : Fragment(), Injectable {
         const val ACTION_COPY = "copy"
         const val ACTION_DELETE = "delete"
         const val ACTION_SHARE = "share"
+        const val ACTION_FAB_SHOW = "fabShow"
+        const val ACTION_FAB_HIDE = "fabHide"
+        const val ACTION_ROOT = "root"
     }
 
     private fun onActionCallback(data: HomeSpaceTable, action: Int) {
@@ -195,7 +207,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
     }
 
     private fun onMoreActionCallback(data: HomeSpaceTable, action: String) {
-        Logger.e(Thread.currentThread(), "data 2 ${Gson().toJson(data)} action $action")
         when (action) {
             ACTION_COPY -> {
                 val clipboard =

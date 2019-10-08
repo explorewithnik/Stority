@@ -57,7 +57,7 @@ class HomeSpaceViewModel @Inject constructor(
         repo.deleteHomeSpaceData(data = data)
     }
 
-    fun deleteHomeSpaceListData(list: List<HomeSpaceTable>?) {
+    fun deleteHomeSpaceListData(list: List<HomeSpaceTable?>) {
         Logger.e(Thread.currentThread(),"viewmodel list $list")
         repo.deleteHomeSpaceDataList(list = list)
     }
