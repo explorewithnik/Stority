@@ -123,7 +123,7 @@ class HomeSpaceAdapter(
             if (showAddAllMenuIcon) {
                 menu?.findItem(R.id.menuAddAll)?.isVisible = true
                 menu?.findItem(R.id.menuRemoveAll)?.isVisible = false
-            }else if(showRemoveAllMenuIcon){
+            } else if (showRemoveAllMenuIcon) {
                 menu?.findItem(R.id.menuAddAll)?.isVisible = false
                 menu?.findItem(R.id.menuRemoveAll)?.isVisible = true
             }
@@ -144,10 +144,17 @@ class HomeSpaceAdapter(
         if (selectedItems.contains(data)) {
             binding?.cv?.strokeColor =
                 ContextCompat.getColor(context, R.color.app_theme_color_accent)
-            binding?.cv?.strokeWidth = 2
+            binding?.cv?.strokeWidth = 3
+            binding?.cv?.setCardBackgroundColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.app_theme_color
+                )
+            )
         } else {
             binding?.cv?.strokeColor = Color.TRANSPARENT
             binding?.cv?.strokeWidth = 0
+            binding?.cv?.setCardBackgroundColor(ContextCompat.getColor(context,R.color.white))
         }
 
         binding?.root?.setOnClickListener {
@@ -173,16 +180,17 @@ class HomeSpaceAdapter(
                 selectedItems.remove(data)
                 cv?.strokeColor = Color.TRANSPARENT
                 cv?.strokeWidth = 0
+                cv?.setCardBackgroundColor(ContextCompat.getColor(context,R.color.white))
                 if (selectedItems.size == 0) {
                     callback?.invoke(listOf(data), ACTION_FAB_SHOW)
                     actionMode?.finish()
                 }
-
             } else {
                 selectedItems.add(data)
                 cv?.strokeColor =
                     ContextCompat.getColor(context, R.color.app_theme_color_accent)
-                cv?.strokeWidth = 2
+                cv?.strokeWidth = 3
+                cv?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.app_theme_color))
             }
 
             if (selectedItems.size > 0) {
@@ -193,14 +201,13 @@ class HomeSpaceAdapter(
 
             if (allListData.size.toString() == actionMode?.title) {
                 showAddAllMenuIcon = true
-                showRemoveAllMenuIcon=false
+                showRemoveAllMenuIcon = false
                 actionMode?.invalidate()
-            }else{
-                showRemoveAllMenuIcon=true
+            } else {
+                showRemoveAllMenuIcon = true
                 showAddAllMenuIcon = false
                 actionMode?.invalidate()
             }
-
 
         } else {
             when (action) {
