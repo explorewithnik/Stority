@@ -86,7 +86,7 @@ class HomeSpaceAdapter(
                 }
 
                 R.id.menuAddAll -> {
-                    mode?.finish()
+                   mode?.finish()
                 }
 
                 R.id.menuRemoveAll -> {
