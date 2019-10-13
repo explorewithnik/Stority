@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
@@ -17,7 +16,6 @@ import com.app.stority.R
 import com.app.stority.databinding.AdapterHomeSpaceBinding
 import com.app.stority.helper.AppExecutors
 import com.app.stority.helper.DataBoundListAdapter
-import com.app.stority.helper.Logger
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ALL
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_DELETE
@@ -54,7 +52,6 @@ class HomeSpaceAdapter(
     private var actionMode: ActionMode? = null
     private var multiSelect = false
     private val selectedItems = ArrayList<HomeSpaceTable?>()
-    var sizeTotal: Int? = null
     override fun createBinding(parent: ViewGroup): AdapterHomeSpaceBinding {
 
         return DataBindingUtil
@@ -68,25 +65,14 @@ class HomeSpaceAdapter(
     }
 
     override fun bind(binding: AdapterHomeSpaceBinding, item: HomeSpaceTable, position: Int) {
-        Logger.e(Thread.currentThread(), "size $sizeTotal")
-        Logger.e(Thread.currentThread(), "bind $position")
-        Logger.e(Thread.currentThread(), "bind  allListData ${allListData.size}")
-        Logger.e(Thread.currentThread(), "bind  selectedItems ${selectedItems.size}")
         binding.data = item
 
-
-//        if (!allListData.contains(item))
-//            allListData.add(item)
         if (cardViewList.size > 0) cardViewList.clear()
         repeat(allListData.size) {
             cardViewList.add(binding.cv)
         }
 
-//        if (!cardViewList.contains(binding.cv))
-//            cardViewList.add(binding.cv)
-
         update(binding.data, binding)
-
     }
 
     inner class ActionModeCallback : ActionMode.Callback {
@@ -119,7 +105,6 @@ class HomeSpaceAdapter(
 
                 }
             }
-
             return true
         }
 
@@ -155,7 +140,6 @@ class HomeSpaceAdapter(
             selectedItems.clear()
             showAddAllMenuIcon = false
             showRemoveAllMenuIcon = false
-            //allListData.clear()
             cardViewList.clear()
             notifyDataSetChanged()
         }
@@ -216,9 +200,7 @@ class HomeSpaceAdapter(
                 cv?.strokeWidth = 3
                 cv?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.app_theme_color))
             }
-            Logger.e(Thread.currentThread(), "selectedItems ${selectedItems.size}")
-            Logger.e(Thread.currentThread(), "allListData ${allListData.size}")
-            Logger.e(Thread.currentThread(), "cardViewList ${cardViewList.size}")
+
             if (selectedItems.size > 0) {
                 actionMode?.title = selectedItems.size.toString()
             } else {
@@ -234,8 +216,6 @@ class HomeSpaceAdapter(
                 showAddAllMenuIcon = false
                 actionMode?.invalidate()
             }
-
-
         } else {
             when (action) {
                 ACTION_ROOT -> {

@@ -61,11 +61,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
                 ACTION_DELETE -> {
                     viewModel.deleteHomeSpaceListData(list = listData)
-//                    repeat(listData.size) {
-//                        adapter.cardViewList.clear()
-//                        adapter.allListData.clear()
-//                    }
-                    adapter.sizeTotal = adapter.sizeTotal?.minus(listData.size) ?: 0
                 }
 
                 ACTION_FAB_SHOW -> {
@@ -96,7 +91,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     endProgress()
                     if (listResource.data != null) {
                         adapter.submitList(listResource.data)
-                        adapter.sizeTotal = listResource.data.size
                         adapter.allListData.clear()
                         adapter.allListData.addAll(listResource.data)
                     } else {
@@ -107,7 +101,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
                     endProgress()
                     if (listResource.code == 502) {
-                        // ServerErrorDialog(context).show()
                     } else {
                         //Toast.makeText(context,"error",Toast.LENGTH_SHORT).show()
                     }
@@ -216,7 +209,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
     private fun onSaveCallback(data: HomeSpaceTable, action: Int) {
         if (!data.text.isNullOrBlank()) {
-            Logger.e(Thread.currentThread(), "onSaveCallback size ${binding.count}")
             adapter.allListData.clear()
             binding.recycler.smoothScrollToPosition(binding.count!!)
             viewModel.insertCategory(data)
@@ -260,9 +252,5 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
         }
 
-    }
-
-    fun fragmentInstance(): HomeSpaceFragment {
-        return activity as HomeSpaceFragment
     }
 }
