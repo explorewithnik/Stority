@@ -34,5 +34,5 @@ abstract class DataBoundListAdapter<T, V: ViewDataBinding>(
         holder.binding.executePendingBindings()
     }
 
-    protected abstract fun bind(binding: V, item: T, position: Int)
+     abstract fun bind(binding: V, item: T, position: Int)
 }

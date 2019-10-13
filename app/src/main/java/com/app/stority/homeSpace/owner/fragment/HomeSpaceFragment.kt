@@ -33,13 +33,13 @@ import javax.inject.Inject
 
 class HomeSpaceFragment : Fragment(), Injectable {
     var binding by autoCleared<FragmentHomeSpaceBinding>()
-    var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
-    var adapter by autoCleared<HomeSpaceAdapter>()
+    private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
+    private var adapter by autoCleared<HomeSpaceAdapter>()
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     @Inject
     lateinit var executors: AppExecutors
-    lateinit var viewModel: HomeSpaceViewModel
+    private lateinit var viewModel: HomeSpaceViewModel
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -61,6 +61,11 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
                 ACTION_DELETE -> {
                     viewModel.deleteHomeSpaceListData(list = listData)
+//                    repeat(listData.size) {
+//                        adapter.cardViewList.clear()
+//                        adapter.allListData.clear()
+//                    }
+                    adapter.sizeTotal = adapter.sizeTotal?.minus(listData.size) ?: 0
                 }
 
                 ACTION_FAB_SHOW -> {
@@ -91,6 +96,9 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     endProgress()
                     if (listResource.data != null) {
                         adapter.submitList(listResource.data)
+                        adapter.sizeTotal = listResource.data.size
+                        adapter.allListData.clear()
+                        adapter.allListData.addAll(listResource.data)
                     } else {
                         adapter.submitList(emptyList())
                     }
@@ -137,6 +145,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
         )
 
         binding.fab.setOnClickListener {
+            binding.fab.hide()
             onActionCallback(HomeSpaceTable(), ACTION_NEW)
         }
 
@@ -169,6 +178,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
     }
 
     companion object {
+        const val ACTION_CANCEL = -1
         const val ACTION_EDIT = 1
         const val ACTION_NEW = 0
         const val ACTION_MORE = 2
@@ -178,6 +188,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
         const val ACTION_FAB_SHOW = "fabShow"
         const val ACTION_FAB_HIDE = "fabHide"
         const val ACTION_ROOT = "root"
+        const val ACTION_ALL = "all"
     }
 
     private fun onActionCallback(data: HomeSpaceTable, action: Int) {
@@ -188,7 +199,8 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     data = data,
                     action = action,
                     dataBindingComponent = dataBindingComponent,
-                    onSaveCallback = this::onSaveCallback
+                    onSaveCallback = this::onSaveCallback,
+                    onCancelCallback = this::onCancelCallback
                 ).show()
             }
 
@@ -203,7 +215,24 @@ class HomeSpaceFragment : Fragment(), Injectable {
     }
 
     private fun onSaveCallback(data: HomeSpaceTable, action: Int) {
-        if (!data.text.isNullOrBlank()) viewModel.insertCategory(data)
+        if (!data.text.isNullOrBlank()) {
+            Logger.e(Thread.currentThread(), "onSaveCallback size ${binding.count}")
+            adapter.allListData.clear()
+            binding.recycler.smoothScrollToPosition(binding.count!!)
+            viewModel.insertCategory(data)
+            binding.fab.show()
+
+        }
+    }
+
+
+    private fun onCancelCallback(action: Int) {
+        when (action) {
+            ACTION_CANCEL -> {
+                binding.fab.show()
+            }
+        }
+
     }
 
     private fun onMoreActionCallback(data: HomeSpaceTable, action: String) {
@@ -230,5 +259,10 @@ class HomeSpaceFragment : Fragment(), Injectable {
             }
 
         }
+
+    }
+
+    fun fragmentInstance(): HomeSpaceFragment {
+        return activity as HomeSpaceFragment
     }
 }

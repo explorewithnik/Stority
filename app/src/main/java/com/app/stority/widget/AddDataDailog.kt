@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import com.app.stority.R
 import com.app.stority.databinding.DialogAddDataBinding
 import com.app.stority.homeSpace.data.HomeSpaceTable
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_CANCEL
 
 
 class AddDataDailog(
@@ -16,7 +17,8 @@ class AddDataDailog(
     private var data: HomeSpaceTable = HomeSpaceTable(),
     private val action: Int,
     private var dataBindingComponent: DataBindingComponent,
-    private val onSaveCallback: ((HomeSpaceTable, Int) -> Unit)
+    private val onSaveCallback: ((HomeSpaceTable, Int) -> Unit),
+    private val onCancelCallback: ((Int) -> Unit)
 ) : Dialog(context, R.style.EditTextDialog) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +41,7 @@ class AddDataDailog(
             }
             bind.cancelButton.setOnClickListener {
                 this.dismiss()
+                onCancelCallback.invoke(ACTION_CANCEL)
             }
 
             this.setCanceledOnTouchOutside(false)
