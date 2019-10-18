@@ -6,11 +6,13 @@ import androidx.room.TypeConverters
 import com.app.stority.BuildConfig
 import com.app.stority.homeSpace.data.HomeSpaceDao
 import com.app.stority.homeSpace.data.HomeSpaceTable
+import com.app.stority.homeSpace.data.SubCategoryTable
 
 
 @Database(
     entities = [
-        (HomeSpaceTable::class)
+        (HomeSpaceTable::class),
+        (SubCategoryTable::class)
     ], version = BuildConfig.VERSION_CODE, exportSchema = false
 )
 @TypeConverters(TypeConverter::class)

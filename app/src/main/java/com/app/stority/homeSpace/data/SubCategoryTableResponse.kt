@@ -1,11 +1,12 @@
 package com.app.stority.homeSpace.data
 
+import com.app.stority.homeSpace.data.SubCategoryTable
 import com.google.gson.annotations.SerializedName
 
-data class HomeSpaceTableResponse(
+data class SubCategoryTableResponse(
 
     @field:SerializedName("data")
-    val homeSpaceTable: List<HomeSpaceTable>? = null,
+    val subCategoryTable: List<SubCategoryTable>? = null,
 
     @field:SerializedName("status")
     val status: String? = null,

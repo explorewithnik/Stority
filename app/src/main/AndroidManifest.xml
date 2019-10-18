@@ -28,6 +28,7 @@
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/MTRLThemeLight">
         <activity android:name=".homeSpace.owner.activity.HomeSpaceActivity"
+            android:screenOrientation="portrait"
             android:label="@string/home_space"
             >
             <intent-filter>

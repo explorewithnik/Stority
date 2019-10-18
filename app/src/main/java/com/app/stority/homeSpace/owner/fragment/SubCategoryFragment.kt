@@ -16,39 +16,43 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.app.stority.R
 import com.app.stority.binding.FragmentDataBindingComponent
-import com.app.stority.databinding.FragmentHomeSpaceBinding
+import com.app.stority.databinding.FragmentSubCategoryBinding
 import com.app.stority.di.Injectable
 import com.app.stority.helper.AppExecutors
 import com.app.stority.helper.Logger
 import com.app.stority.helper.autoCleared
-import com.app.stority.homeSpace.data.HomeSpaceTable
-import com.app.stority.homeSpace.observer.HomeSpaceViewModel
-import com.app.stority.homeSpace.owner.adapter.HomeSpaceAdapter
 import com.app.stority.remoteUtils.Status
-import com.app.stority.widget.AddDataDailog
-import com.app.stority.widget.MultipleOptionDailog
+import com.app.stority.homeSpace.data.SubCategoryTable
+import com.app.stority.homeSpace.observer.SubCategoryViewModel
+import com.app.stority.homeSpace.owner.activity.SubCategoryAdapter
+import com.app.stority.widget.AddSubCategoryDailog
 import com.google.gson.Gson
 import javax.inject.Inject
 
 
-class HomeSpaceFragment : Fragment(), Injectable {
-    var binding by autoCleared<FragmentHomeSpaceBinding>()
+class SubCategoryFragment : Fragment(), Injectable {
+    var binding by autoCleared<FragmentSubCategoryBinding>()
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
-    private var adapter by autoCleared<HomeSpaceAdapter>()
+    private var adapter by autoCleared<SubCategoryAdapter>()
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     @Inject
     lateinit var executors: AppExecutors
-    private lateinit var viewModel: HomeSpaceViewModel
+    private lateinit var viewModel: SubCategoryViewModel
+
+    var entryId = ""
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(HomeSpaceViewModel::class.java)
+            .get(SubCategoryViewModel::class.java)
+
+        entryId = savedInstanceState?.getString(entryId)
+            ?: SubCategoryFragmentArgs.fromBundle(arguments).entryId
 
         viewModel.init()
 
-        adapter = HomeSpaceAdapter(
+        adapter = SubCategoryAdapter(
             context = requireContext(),
             dataBindingComponent = dataBindingComponent,
             appExecutors = executors
@@ -56,14 +60,11 @@ class HomeSpaceFragment : Fragment(), Injectable {
             when (action) {
 
                 ACTION_ROOT -> {
-                    val fragAction = HomeSpaceFragmentDirections.SubCategoryFragment()
-                    fragAction.entryId = listData[0]!!.id.toString()
-                    navController().navigate(fragAction)
                     Logger.e(Thread.currentThread(), "item ${Gson().toJson(listData)}")
                 }
 
                 ACTION_DELETE -> {
-                    viewModel.deleteHomeSpaceListData(list = listData)
+                    viewModel.deleteSubCategoryListData(list = listData)
                 }
 
                 ACTION_FAB_SHOW -> {
@@ -84,7 +85,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
         initEntryList(viewModel)
     }
 
-    private fun initEntryList(viewModel: HomeSpaceViewModel) {
+    private fun initEntryList(viewModel: SubCategoryViewModel) {
         viewModel.result.observe(this, Observer { listResource ->
             binding.count = listResource?.data?.size
             binding.status = listResource?.status
@@ -142,7 +143,10 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
         binding.fab.setOnClickListener {
             binding.fab.hide()
-            onActionCallback(HomeSpaceTable(), ACTION_NEW)
+            onActionCallback(
+                SubCategoryTable(),
+                ACTION_NEW
+            )
         }
 
         return binding.root
@@ -157,16 +161,16 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.home_space_menu, menu)
+        inflater.inflate(R.menu.sub_category_menu, menu)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        menu.findItem(R.id.menuSearch)?.isVisible = true
+        menu.findItem(R.id.subCategoryMenuSearch)?.isVisible = true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menuSearch -> {
+            R.id.subCategoryMenuSearch -> {
                 Logger.e(Thread.currentThread(), "search")
             }
         }
@@ -174,6 +178,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
     }
 
     companion object {
+        const val ENTRY_ID = "entry_id"
         const val ACTION_CANCEL = -1
         const val ACTION_EDIT = 1
         const val ACTION_NEW = 0
@@ -187,10 +192,10 @@ class HomeSpaceFragment : Fragment(), Injectable {
         const val ACTION_ALL = "all"
     }
 
-    private fun onActionCallback(data: HomeSpaceTable, action: Int) {
+    private fun onActionCallback(data: SubCategoryTable, action: Int) {
         when (action) {
             ACTION_NEW -> {
-                AddDataDailog(
+                AddSubCategoryDailog(
                     context = requireContext(),
                     data = data,
                     action = action,
@@ -200,21 +205,21 @@ class HomeSpaceFragment : Fragment(), Injectable {
                 ).show()
             }
 
-            ACTION_MORE -> {
-                MultipleOptionDailog(
-                    context = requireContext(),
-                    data = data,
-                    onMoreActionCalback = this::onMoreActionCallback
-                ).show()
-            }
+//            ACTION_MORE -> {
+//                MultipleOptionDailog(
+//                    context = requireContext(),
+//                    data = data,
+//                    onMoreActionCalback = this::onMoreActionCallback
+//                ).show()
+//            }
         }
     }
 
-    private fun onSaveCallback(data: HomeSpaceTable, action: Int) {
+    private fun onSaveCallback(data: SubCategoryTable, action: Int) {
         if (!data.text.isNullOrBlank()) {
             adapter.allListData.clear()
             binding.recycler.smoothScrollToPosition(binding.count!!)
-            viewModel.insertCategory(data)
+            viewModel.insertSubCategory(data)
         }
         binding.fab.show()
     }
@@ -229,7 +234,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
     }
 
-    private fun onMoreActionCallback(data: HomeSpaceTable, action: String) {
+    private fun onMoreActionCallback(data: SubCategoryTable, action: String) {
         when (action) {
             ACTION_COPY -> {
                 val clipboard =
@@ -241,7 +246,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
             }
 
             ACTION_DELETE -> {
-                viewModel.deleteHomeSpaceData(data = data)
+                viewModel.deleteSubCategoryData(data = data)
             }
 
             ACTION_SHARE -> {
@@ -254,5 +259,10 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
         }
 
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(ENTRY_ID, entryId)
     }
 }

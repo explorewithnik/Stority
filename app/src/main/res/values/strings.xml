@@ -43,6 +43,8 @@
     <string name="add_menu_title">Add</string>
     <string name="home_space">Home Space</string>
     <string name="add_data_dialog_title">New Category</string>
+    <string name="add_sub_category_data_dialog_title">Add Note</string>
+    <string name="add_sub_category_data_dialog">Note</string>
     <string name="add_a_category">Add a category</string>
     <string name="save_button">save</string>
     <string name="add_button">ADD</string>

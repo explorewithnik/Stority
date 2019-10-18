@@ -11,5 +11,23 @@
         android:name="com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment"
         android:label="homeSpaceFragment">
 
+        <action android:id="@id/SubCategoryFragment"
+            app:destination="@id/SubCategoryFragment"/>
+
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/SubCategoryFragment"
+        tools:layout="@layout/fragment_sub_category"
+        android:name="com.app.stority.homeSpace.owner.fragment.SubCategoryFragment"
+        android:label="SubCategoryFragment">
+
+        <argument
+            android:name="entryId"
+            android:defaultValue="-1"
+            app:argType="string"
+            />
+
     </fragment>
 </navigation>
