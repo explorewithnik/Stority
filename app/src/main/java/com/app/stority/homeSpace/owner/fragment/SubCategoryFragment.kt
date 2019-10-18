@@ -40,7 +40,7 @@ class SubCategoryFragment : Fragment(), Injectable {
     lateinit var executors: AppExecutors
     private lateinit var viewModel: SubCategoryViewModel
 
-    var entryId = ""
+    private var entryId = ""
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -48,9 +48,9 @@ class SubCategoryFragment : Fragment(), Injectable {
             .get(SubCategoryViewModel::class.java)
 
         entryId = savedInstanceState?.getString(entryId)
-            ?: SubCategoryFragmentArgs.fromBundle(arguments).entryId
+            ?: SubCategoryFragmentArgs.fromBundle(arguments!!).entryId
 
-        viewModel.init()
+        viewModel.init(entryId)
 
         adapter = SubCategoryAdapter(
             context = requireContext(),

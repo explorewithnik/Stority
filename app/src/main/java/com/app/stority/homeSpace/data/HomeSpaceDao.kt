@@ -23,7 +23,7 @@ interface HomeSpaceDao {
     fun fetchAllSubCategoryData(): LiveData<List<SubCategoryTable>>
 
     @Query("SELECT * FROM SubCategoryTable WHERE id=:id")
-    fun fetchSubCategoryDataList(id:Int): LiveData<List<SubCategoryTable>>
+    fun fetchSubCategoryDataList(id:Int?): LiveData<List<SubCategoryTable>>
 
     @Query("SELECT * FROM HomeSpaceTable WHERE id= :id ")
     fun fetchHomeSpaceData(id: String): LiveData<HomeSpaceTable>

@@ -44,12 +44,12 @@ class SubCategoryViewModel @Inject constructor(
         data
         when (apiCall.value) {
             null -> AbsentLiveData.create()
-            else -> repo.fetchSubCategoryDataList(false)
+            else -> repo.fetchSubCategoryDataList(false, apiCall.value)
         }
     }
 
-    fun init() {
-        apiCall.value = "1"
+    fun init(entryId: String) {
+        apiCall.value = entryId
     }
 
     fun deleteSubCategoryData(data: SubCategoryTable?) {

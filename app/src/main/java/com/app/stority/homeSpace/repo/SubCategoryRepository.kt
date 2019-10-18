@@ -22,7 +22,7 @@ class SubCategoryRepository @Inject constructor(
     private val dao: HomeSpaceDao
 ) {
 
-    fun fetchSubCategoryDataList(shouldFetch: Boolean): LiveData<Resource<List<SubCategoryTable>>> {
+    fun fetchSubCategoryDataList(shouldFetch: Boolean, id: String?): LiveData<Resource<List<SubCategoryTable>>> {
 
         return object : NetworkBoundResource<List<SubCategoryTable>, SubCategoryTableResponse>(executor) {
 
@@ -37,7 +37,7 @@ class SubCategoryRepository @Inject constructor(
             override fun saveCallResult(item: SubCategoryTableResponse) {
             }
 
-            override fun loadFromDb() = dao.fetchAllSubCategoryData()
+            override fun loadFromDb() = dao.fetchSubCategoryDataList(id?.toInt())
 
         }.asLiveData()
     }
