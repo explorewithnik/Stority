@@ -14,10 +14,10 @@ import com.app.stority.homeSpace.data.SubCategoryTable
 
 class AddSubCategoryDailog(
     @get:JvmName("getContext_") val context: Context,
-    private var data: SubCategoryTable = SubCategoryTable(),
+    private var data: SubCategoryTable? = SubCategoryTable(),
     private val action: Int,
     private var dataBindingComponent: DataBindingComponent,
-    private val onSaveCallback: ((SubCategoryTable, Int) -> Unit),
+    private val onSaveCallback: ((SubCategoryTable?, Int) -> Unit),
     private val onCancelCallback: ( (Int) -> Unit)
 ) : Dialog(context, R.style.EditTextDialog) {
 

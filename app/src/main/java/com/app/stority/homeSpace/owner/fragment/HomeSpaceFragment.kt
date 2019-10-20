@@ -59,7 +59,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     val fragAction = HomeSpaceFragmentDirections.SubCategoryFragment()
                     fragAction.entryId = listData[0]!!.id.toString()
                     navController().navigate(fragAction)
-                    Logger.e(Thread.currentThread(), "item ${Gson().toJson(listData)}")
                 }
 
                 ACTION_DELETE -> {
@@ -72,6 +71,13 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
                 ACTION_FAB_HIDE -> {
                     binding.fab.hide()
+                }
+
+
+                ACTION_MORE -> {
+                    Logger.e(Thread.currentThread(), "ACTION_MORE ${Gson().toJson(listData[0])}")
+                    binding.fab.hide()
+                    onActionCallback(listData[0], ACTION_MORE_INT)
                 }
 
             }
@@ -175,9 +181,13 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
     companion object {
         const val ACTION_CANCEL = -1
-        const val ACTION_EDIT = 1
+        const val ACTION_EDIT = "edit"
+        const val ACTION_RENAME = 1
+
         const val ACTION_NEW = 0
-        const val ACTION_MORE = 2
+        const val ACTION_MORE = "more"
+        const val ACTION_MORE_INT = 2
+
         const val ACTION_COPY = "copy"
         const val ACTION_DELETE = "delete"
         const val ACTION_SHARE = "share"
@@ -187,7 +197,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
         const val ACTION_ALL = "all"
     }
 
-    private fun onActionCallback(data: HomeSpaceTable, action: Int) {
+    private fun onActionCallback(data: HomeSpaceTable?, action: Int) {
         when (action) {
             ACTION_NEW -> {
                 AddDataDailog(
@@ -200,22 +210,52 @@ class HomeSpaceFragment : Fragment(), Injectable {
                 ).show()
             }
 
-            ACTION_MORE -> {
+            ACTION_RENAME -> {
+                AddDataDailog(
+                    context = requireContext(),
+                    data = data,
+                    action = action,
+                    dataBindingComponent = dataBindingComponent,
+                    onSaveCallback = this::onSaveCallback,
+                    onCancelCallback = this::onCancelCallback
+                ).show()
+
+            }
+
+            ACTION_MORE_INT -> {
                 MultipleOptionDailog(
                     context = requireContext(),
                     data = data,
-                    onMoreActionCalback = this::onMoreActionCallback
+                    onMoreActionCalback = this::onMoreActionCallback,
+                    onCancelCallback = this::onCancelCallback
                 ).show()
             }
         }
     }
 
-    private fun onSaveCallback(data: HomeSpaceTable, action: Int) {
-        if (!data.text.isNullOrBlank()) {
-            adapter.allListData.clear()
-            binding.recycler.smoothScrollToPosition(binding.count!!)
-            viewModel.insertCategory(data)
+    private fun onSaveCallback(data: HomeSpaceTable?, action: Int) {
+
+        when (action) {
+            ACTION_NEW -> {
+                if (!data?.text.isNullOrBlank()) {
+                    adapter.allListData.clear()
+                    adapter.notifyDataSetChanged()
+                    data?.rename = false
+                    viewModel.insertCategory(data)
+
+                    binding.recycler.smoothScrollToPosition(0)
+                }
+            }
+
+            ACTION_RENAME -> {
+                Logger.e(Thread.currentThread(), "data rename ${Gson().toJson(data)}")
+                data?.rename = true
+                viewModel.updateCategory(data)
+                adapter.notifyDataSetChanged()
+            }
+
         }
+
         binding.fab.show()
     }
 
@@ -229,26 +269,27 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
     }
 
-    private fun onMoreActionCallback(data: HomeSpaceTable, action: String) {
+    private fun onMoreActionCallback(data: HomeSpaceTable?, action: String) {
         when (action) {
             ACTION_COPY -> {
                 val clipboard =
                     requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
-                val clip = ClipData.newPlainText("label", data.text)
+                val clip = ClipData.newPlainText("label", data?.text)
                 clipboard?.setPrimaryClip(clip)
 
                 Toast.makeText(requireContext(), "copied", Toast.LENGTH_SHORT).show()
             }
 
-            ACTION_DELETE -> {
-                viewModel.deleteHomeSpaceData(data = data)
+            ACTION_EDIT -> {
+                Logger.e(Thread.currentThread(), "ACTION_EDIT ${Gson().toJson(data)}")
+                onActionCallback(data, ACTION_RENAME)
             }
 
             ACTION_SHARE -> {
                 val sharingIntent = Intent(Intent.ACTION_SEND)
                 sharingIntent.type = "text/plain"
                 sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Note")
-                sharingIntent.putExtra(Intent.EXTRA_TEXT, data.text)
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, data?.text)
                 startActivity(Intent.createChooser(sharingIntent, "Share via"))
             }
 

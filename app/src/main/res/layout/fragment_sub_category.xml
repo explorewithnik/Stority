@@ -15,7 +15,7 @@
 
         <variable
             name="adapter"
-            type="com.app.stority.homeSpace.owner.activity.SubCategoryAdapter" />
+            type="com.app.stority.homeSpace.owner.adapter.SubCategoryAdapter" />
 
         <variable
             name="count"

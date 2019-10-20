@@ -61,10 +61,14 @@ class HomeSpaceViewModel @Inject constructor(
     }
 
 
-    fun insertCategory(data: HomeSpaceTable) {
+    fun insertCategory(data: HomeSpaceTable?) {
         repo.insertCategoryData(data)
 
     }
 
+
+    fun updateCategory(data: HomeSpaceTable?) {
+        repo.updateCategory(data)
+    }
 
 }

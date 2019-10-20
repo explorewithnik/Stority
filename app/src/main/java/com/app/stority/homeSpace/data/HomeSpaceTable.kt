@@ -16,6 +16,10 @@ data class HomeSpaceTable(
     @field : SerializedName("text")
     var text: String? = null,
 
+
+    @field : SerializedName("rename")
+    var rename: Boolean? = null,
+
     @field : SerializedName("timeStamp")
     var timeStamp: String? = System.currentTimeMillis().toString()
 

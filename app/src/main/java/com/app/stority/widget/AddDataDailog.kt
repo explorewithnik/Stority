@@ -14,10 +14,10 @@ import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTI
 
 class AddDataDailog(
     @get:JvmName("getContext_") val context: Context,
-    private var data: HomeSpaceTable = HomeSpaceTable(),
+    private var data: HomeSpaceTable? = HomeSpaceTable(),
     private val action: Int,
     private var dataBindingComponent: DataBindingComponent,
-    private val onSaveCallback: ((HomeSpaceTable, Int) -> Unit),
+    private val onSaveCallback: ((HomeSpaceTable?, Int) -> Unit),
     private val onCancelCallback: ((Int) -> Unit)
 ) : Dialog(context, R.style.EditTextDialog) {
 
@@ -32,6 +32,7 @@ class AddDataDailog(
         ).also { bind ->
             setContentView(bind.root)
             bind.data = data
+
             bind.saveButton.setOnClickListener {
                 bind?.data?.let {
 
@@ -43,6 +44,7 @@ class AddDataDailog(
                 this.dismiss()
                 onCancelCallback.invoke(ACTION_CANCEL)
             }
+
 
             this.setCanceledOnTouchOutside(false)
         }

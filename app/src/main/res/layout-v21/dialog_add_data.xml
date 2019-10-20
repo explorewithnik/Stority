@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
+
         <variable
             name="data"
             type="com.app.stority.homeSpace.data.HomeSpaceTable" />
@@ -10,8 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        >
+        android:fitsSystemWindows="true">
 
 
         <TextView
@@ -19,6 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/activity_horizontal_margin_normal"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin_normal"
             android:layout_marginTop="20dp"
             android:fontFamily="@font/roboto"
             android:text="@string/add_data_dialog_title"
@@ -35,21 +37,20 @@
             app:layout_constraintTop_toBottomOf="@id/title_text_view">
 
             <EditText
-                android:singleLine="true"
-                android:inputType="text"
                 android:id="@+id/category_et"
                 style="@style/Widget.AppCompat.EditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
                 android:layout_marginTop="40dp"
+                android:layout_marginEnd="20dp"
                 android:fontFamily="@font/roboto"
                 android:hint="@string/add_a_category"
+                android:inputType="text"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
+                android:singleLine="true"
                 android:text='@={data.text}'
-                android:textColor="@drawable/edittext_pressed_state"
                 android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -64,12 +65,14 @@
                 android:layout_marginTop="40dp"
                 android:fontFamily="@font/roboto"
                 android:paddingStart="8dp"
+                android:paddingLeft="8dp"
                 android:paddingEnd="20dp"
-                android:textSize="12sp"
+                android:paddingRight="20dp"
                 android:paddingBottom="20dp"
                 android:text="@string/cancel"
-                android:textStyle="bold"
                 android:textColor="@color/app_theme_color_accent"
+                android:textSize="12sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/save_button"
                 app:layout_constraintTop_toBottomOf="@id/category_et"
@@ -82,14 +85,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
                 android:layout_marginEnd="8dp"
-                android:paddingEnd="2dp"
+                android:layout_marginRight="8dp"
                 android:fontFamily="@font/roboto"
                 android:paddingStart="8dp"
+                android:paddingLeft="8dp"
+                android:paddingEnd="2dp"
+                android:paddingRight="2dp"
                 android:paddingBottom="20dp"
-                android:textStyle="bold"
-                android:textSize="12sp"
                 android:text="@string/add_button"
                 android:textColor="@color/app_theme_color_accent"
+                android:textSize="12sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@id/category_et"
                 app:layout_constraintTop_toBottomOf="@id/category_et"

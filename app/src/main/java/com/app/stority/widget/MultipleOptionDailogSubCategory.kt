@@ -7,7 +7,9 @@ import android.view.LayoutInflater
 import androidx.databinding.DataBindingUtil
 import com.app.stority.R
 import com.app.stority.databinding.DialogMultipleOptionBinding
+import com.app.stority.databinding.DialogMultipleOptionSubCategoryBinding
 import com.app.stority.homeSpace.data.HomeSpaceTable
+import com.app.stority.homeSpace.data.SubCategoryTable
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_CANCEL
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_COPY
@@ -17,19 +19,19 @@ import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTI
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 
-class MultipleOptionDailog(
+class MultipleOptionDailogSubCategory(
     @get:JvmName("getContext_") val context: Context,
-    private var data: HomeSpaceTable? = HomeSpaceTable(),
-    private val onMoreActionCalback: ((HomeSpaceTable?, String) -> Unit),
+    private var data: SubCategoryTable? = SubCategoryTable(),
+    private val onMoreActionCalback: ((SubCategoryTable?, String) -> Unit),
     private val onCancelCallback: ((Int) -> Unit)
 ) : BottomSheetDialog(context, R.style.BottomSheetDialogTheme) {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DataBindingUtil.inflate<DialogMultipleOptionBinding>(
+        DataBindingUtil.inflate<DialogMultipleOptionSubCategoryBinding>(
             LayoutInflater.from(context),
-            R.layout.dialog_multiple_option,
+            R.layout.dialog_multiple_option_sub_category,
             null,
             false,
             null

@@ -1,4 +1,4 @@
-package com.app.stority.homeSpace.owner.activity
+package com.app.stority.homeSpace.owner.adapter
 
 import android.content.Context
 import android.graphics.Color
@@ -22,6 +22,7 @@ import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTI
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_SHOW
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ROOT
 import com.app.stority.homeSpace.data.SubCategoryTable
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 
 
@@ -36,11 +37,11 @@ class SubCategoryAdapter(
     appExecutors = appExecutors,
     diffCallback = object : DiffUtil.ItemCallback<SubCategoryTable>() {
         override fun areItemsTheSame(oldItem: SubCategoryTable, newItem: SubCategoryTable): Boolean {
-            return oldItem.subCategoryId == newItem.subCategoryId
+            return oldItem.subCategoryId == newItem.subCategoryId && oldItem.text == newItem.text
         }
 
         override fun areContentsTheSame(oldItem: SubCategoryTable, newItem: SubCategoryTable): Boolean {
-            return oldItem.subCategoryId == newItem.subCategoryId
+            return oldItem.subCategoryId == newItem.subCategoryId && oldItem.text == newItem.text
         }
     }
 ) {
@@ -70,6 +71,12 @@ class SubCategoryAdapter(
         if (cardViewList.size > 0) cardViewList.clear()
         repeat(allListData.size) {
             cardViewList.add(binding.cv)
+        }
+
+        binding.more?.setOnClickListener {
+            binding.data?.let { data ->
+                callback?.invoke(listOf(data), HomeSpaceFragment.ACTION_MORE)
+            }
         }
 
         update(binding.data, binding)

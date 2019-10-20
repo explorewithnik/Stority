@@ -24,7 +24,8 @@ class HomeSpaceRepository @Inject constructor(
 
     fun fetchHomeSpaceDataList(shouldFetch: Boolean): LiveData<Resource<List<HomeSpaceTable>>> {
 
-        return object : NetworkBoundResource<List<HomeSpaceTable>, HomeSpaceTableResponse>(executor) {
+        return object :
+            NetworkBoundResource<List<HomeSpaceTable>, HomeSpaceTableResponse>(executor) {
 
             override fun shouldFetch(data: List<HomeSpaceTable>?) = shouldFetch
 
@@ -62,8 +63,11 @@ class HomeSpaceRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun insertCategoryData(data: HomeSpaceTable) =
+    fun insertCategoryData(data: HomeSpaceTable?) =
         executor.diskIO().execute { dao.insertHomeSpaceData(data = data) }
+
+    fun updateCategory(data: HomeSpaceTable?) =
+        executor.diskIO().execute { dao.updateHomeSpaceData(data = data) }
 
     fun deleteHomeSpaceAllData() = executor.diskIO().execute { dao.deleteHomeSpaceAllData() }
 

@@ -51,7 +51,6 @@
                 android:paddingEnd="4dp"
                 android:singleLine="true"
                 android:text='@={data.text}'
-                android:textColor="@drawable/edittext_pressed_state"
                 android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

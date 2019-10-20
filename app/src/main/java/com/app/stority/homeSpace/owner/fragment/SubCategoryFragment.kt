@@ -24,8 +24,11 @@ import com.app.stority.helper.autoCleared
 import com.app.stority.remoteUtils.Status
 import com.app.stority.homeSpace.data.SubCategoryTable
 import com.app.stority.homeSpace.observer.SubCategoryViewModel
-import com.app.stority.homeSpace.owner.activity.SubCategoryAdapter
+import com.app.stority.homeSpace.owner.adapter.SubCategoryAdapter
+import com.app.stority.widget.AddDataDailog
 import com.app.stority.widget.AddSubCategoryDailog
+import com.app.stority.widget.MultipleOptionDailog
+import com.app.stority.widget.MultipleOptionDailogSubCategory
 import com.google.gson.Gson
 import javax.inject.Inject
 
@@ -73,6 +76,11 @@ class SubCategoryFragment : Fragment(), Injectable {
 
                 ACTION_FAB_HIDE -> {
                     binding.fab.hide()
+                }
+
+                ACTION_MORE -> {
+                    binding.fab.hide()
+                    onActionCallback(listData[0], ACTION_MORE_INT)
                 }
 
             }
@@ -135,7 +143,7 @@ class SubCategoryFragment : Fragment(), Injectable {
 
         binding = DataBindingUtil.inflate(
             inflater,
-            R.layout.fragment_home_space,
+            R.layout.fragment_sub_category,
             container,
             false,
             dataBindingComponent
@@ -180,9 +188,12 @@ class SubCategoryFragment : Fragment(), Injectable {
     companion object {
         const val ENTRY_ID = "entry_id"
         const val ACTION_CANCEL = -1
-        const val ACTION_EDIT = 1
+        const val ACTION_EDIT = "edit"
         const val ACTION_NEW = 0
-        const val ACTION_MORE = 2
+        const val ACTION_MORE = "more"
+        const val ACTION_MORE_INT = 2
+        const val ACTION_RENAME = 1
+
         const val ACTION_COPY = "copy"
         const val ACTION_DELETE = "delete"
         const val ACTION_SHARE = "share"
@@ -192,7 +203,7 @@ class SubCategoryFragment : Fragment(), Injectable {
         const val ACTION_ALL = "all"
     }
 
-    private fun onActionCallback(data: SubCategoryTable, action: Int) {
+    private fun onActionCallback(data: SubCategoryTable?, action: Int) {
         when (action) {
             ACTION_NEW -> {
                 AddSubCategoryDailog(
@@ -204,22 +215,45 @@ class SubCategoryFragment : Fragment(), Injectable {
                     onCancelCallback = this::onCancelCallback
                 ).show()
             }
+            ACTION_RENAME -> {
+                AddSubCategoryDailog(
+                    context = requireContext(),
+                    data = data,
+                    action = action,
+                    dataBindingComponent = dataBindingComponent,
+                    onSaveCallback = this::onSaveCallback,
+                    onCancelCallback = this::onCancelCallback
+                ).show()
 
-//            ACTION_MORE -> {
-//                MultipleOptionDailog(
-//                    context = requireContext(),
-//                    data = data,
-//                    onMoreActionCalback = this::onMoreActionCallback
-//                ).show()
-//            }
+            }
+
+            ACTION_MORE_INT -> {
+                MultipleOptionDailogSubCategory(
+                    context = requireContext(),
+                    data = data,
+                    onMoreActionCalback = this::onMoreActionCallback,
+                    onCancelCallback = this::onCancelCallback
+                ).show()
+            }
+
         }
     }
 
-    private fun onSaveCallback(data: SubCategoryTable, action: Int) {
-        if (!data.text.isNullOrBlank()) {
-            adapter.allListData.clear()
-            binding.recycler.smoothScrollToPosition(binding.count!!)
-            viewModel.insertSubCategory(data)
+    private fun onSaveCallback(data: SubCategoryTable?, action: Int) {
+
+        when (action) {
+            ACTION_RENAME -> {
+                viewModel.updateSubCategory(data)
+                adapter.notifyDataSetChanged()
+            }
+
+            ACTION_NEW -> {
+                if (!data?.text.isNullOrBlank()) {
+                    adapter.allListData.clear()
+                    binding.recycler.smoothScrollToPosition(binding.count!!)
+                    viewModel.insertSubCategory(entryId, data)
+                }
+            }
         }
         binding.fab.show()
     }
@@ -234,26 +268,25 @@ class SubCategoryFragment : Fragment(), Injectable {
 
     }
 
-    private fun onMoreActionCallback(data: SubCategoryTable, action: String) {
+    private fun onMoreActionCallback(data: SubCategoryTable?, action: String) {
         when (action) {
             ACTION_COPY -> {
                 val clipboard =
                     requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
-                val clip = ClipData.newPlainText("label", data.text)
+                val clip = ClipData.newPlainText("label", data?.text)
                 clipboard?.setPrimaryClip(clip)
 
                 Toast.makeText(requireContext(), "copied", Toast.LENGTH_SHORT).show()
             }
-
-            ACTION_DELETE -> {
-                viewModel.deleteSubCategoryData(data = data)
+            ACTION_EDIT -> {
+                onActionCallback(data, ACTION_RENAME)
             }
 
             ACTION_SHARE -> {
                 val sharingIntent = Intent(Intent.ACTION_SEND)
                 sharingIntent.type = "text/plain"
                 sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Note")
-                sharingIntent.putExtra(Intent.EXTRA_TEXT, data.text)
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, data?.text)
                 startActivity(Intent.createChooser(sharingIntent, "Share via"))
             }
 

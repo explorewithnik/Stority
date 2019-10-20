@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.remoteUtils.AbsentLiveData
 import com.app.stority.remoteUtils.Resource
 import com.app.stority.homeSpace.data.SubCategoryTable
@@ -61,9 +62,14 @@ class SubCategoryViewModel @Inject constructor(
     }
 
 
-    fun insertSubCategory(data: SubCategoryTable) {
-        repo.insertSubCategoryData(data)
+    fun insertSubCategory(entryId: String, data: SubCategoryTable?) {
 
+        repo.insertSubCategoryData(entryId,data)
+
+    }
+
+    fun updateSubCategory(data: SubCategoryTable?) {
+        repo.updateCategory(data)
     }
 
 

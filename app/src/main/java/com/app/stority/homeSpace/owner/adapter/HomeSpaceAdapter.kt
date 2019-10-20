@@ -21,6 +21,7 @@ import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTI
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_DELETE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_HIDE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_SHOW
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_MORE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ROOT
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 
@@ -36,11 +37,11 @@ class HomeSpaceAdapter(
     appExecutors = appExecutors,
     diffCallback = object : DiffUtil.ItemCallback<HomeSpaceTable>() {
         override fun areItemsTheSame(oldItem: HomeSpaceTable, newItem: HomeSpaceTable): Boolean {
-            return oldItem.id == newItem.id
+            return  oldItem.id == newItem.id && oldItem.text == newItem.text
         }
 
         override fun areContentsTheSame(oldItem: HomeSpaceTable, newItem: HomeSpaceTable): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.id == newItem.id && oldItem.text == newItem.text
         }
     }
 ) {
@@ -48,7 +49,7 @@ class HomeSpaceAdapter(
     var allListData = ArrayList<HomeSpaceTable?>()
     private var showAddAllMenuIcon = false
     private var showRemoveAllMenuIcon = false
-     var cardViewList = ArrayList<CircularRevealCardView?>()
+    var cardViewList = ArrayList<CircularRevealCardView?>()
     private var actionMode: ActionMode? = null
     private var multiSelect = false
     private val selectedItems = ArrayList<HomeSpaceTable?>()
@@ -70,6 +71,13 @@ class HomeSpaceAdapter(
         if (cardViewList.size > 0) cardViewList.clear()
         repeat(allListData.size) {
             cardViewList.add(binding.cv)
+        }
+
+        binding.more?.setOnClickListener {
+            binding.data?.let { data ->
+
+                callback?.invoke(listOf(data), ACTION_MORE)
+            }
         }
 
         update(binding.data, binding)
@@ -176,6 +184,9 @@ class HomeSpaceAdapter(
             }
             return@setOnLongClickListener true
         }
+
+
+
 
     }
 
