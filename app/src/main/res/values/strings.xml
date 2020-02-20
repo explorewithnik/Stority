@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Stority</string>
+    <string name="app_name">Home Space</string>
     <string name= "filled_bullet"> \u25CF</string>
 
     <string name="tap_preview_message">Tap on the preview to focus</string>

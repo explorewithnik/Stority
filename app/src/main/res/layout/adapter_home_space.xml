@@ -7,7 +7,7 @@
 
         <variable
             name="data"
-            type="com.app.stority.homeSpace.data.HomeSpaceTable" />
+            type="com.app.homeSpace.homeSpace.data.HomeSpaceTable" />
     </data>
 
     <com.google.android.material.circularreveal.cardview.CircularRevealCardView
@@ -27,6 +27,8 @@
             app:layout_constraintWidth_percent="0.5">
 
             <TextView
+                android:autoLink="all"
+                android:linksClickable="true"
                 android:id="@+id/text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

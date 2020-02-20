@@ -6,7 +6,7 @@
 
         <variable
             name="data"
-            type="com.app.stority.homeSpace.data.HomeSpaceTable" />
+            type="com.app.homeSpace.homeSpace.data.HomeSpaceTable" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,7 +46,7 @@
                 android:layout_marginEnd="20dp"
                 android:fontFamily="@font/roboto"
                 android:hint="@string/add_a_category"
-                android:inputType="text"
+                android:inputType="textCapWords"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
                 android:singleLine="true"

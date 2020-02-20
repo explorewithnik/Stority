@@ -7,27 +7,33 @@
 
     <fragment
         android:id="@+id/homeSpaceFragment"
-        tools:layout="@layout/fragment_home_space"
-        android:name="com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment"
-        android:label="homeSpaceFragment">
+        android:name="com.app.homeSpace.homeSpace.owner.fragment.HomeSpaceFragment"
+        android:label="homeSpaceFragment"
+        tools:layout="@layout/fragment_home_space">
 
-        <action android:id="@id/SubCategoryFragment"
-            app:destination="@id/SubCategoryFragment"/>
+        <action
+            android:id="@id/SubCategoryFragment"
+            app:destination="@id/SubCategoryFragment"
+             />
 
 
     </fragment>
 
     <fragment
         android:id="@+id/SubCategoryFragment"
-        tools:layout="@layout/fragment_sub_category"
-        android:name="com.app.stority.homeSpace.owner.fragment.SubCategoryFragment"
-        android:label="SubCategoryFragment">
+        android:name="com.app.homeSpace.homeSpace.owner.fragment.SubCategoryFragment"
+        android:label="SubCategoryFragment"
+        tools:layout="@layout/fragment_sub_category">
 
         <argument
             android:name="entryId"
             android:defaultValue="-1"
-            app:argType="string"
-            />
+            app:argType="string" />
+
+        <argument
+            android:name="text"
+            android:defaultValue="null"
+            app:argType="string" />
 
     </fragment>
 </navigation>

@@ -5,7 +5,7 @@
 
     <fragment
             android:id="@+id/displayFragment"
-            android:name="com.app.stority.displayImage.DisplayFragment"
+            android:name="com.app.homeSpace.displayImage.DisplayFragment"
             android:label="display_fragment" />
 
 </navigation>

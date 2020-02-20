@@ -7,15 +7,15 @@
 
         <import type="android.view.View" />
 
-        <import type="com.app.stority.remoteUtils.Status" />
+        <import type="com.app.homeSpace.remoteUtils.Status" />
 
         <variable
             name="resource"
-            type="com.app.stority.remoteUtils.Resource" />
+            type="com.app.homeSpace.remoteUtils.Resource" />
 
         <variable
             name="adapter"
-            type="com.app.stority.homeSpace.owner.adapter.SubCategoryAdapter" />
+            type="com.app.homeSpace.homeSpace.owner.adapter.SubCategoryAdapter" />
 
         <variable
             name="count"
@@ -23,7 +23,7 @@
 
         <variable
             name="status"
-            type="com.app.stority.remoteUtils.Status" />
+            type="com.app.homeSpace.remoteUtils.Status" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
