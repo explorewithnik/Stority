@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -14,6 +15,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.app.homeSpace.R
 import com.app.homeSpace.binding.FragmentDataBindingComponent
 import com.app.homeSpace.databinding.FragmentHomeSpaceBinding
@@ -41,11 +44,22 @@ class HomeSpaceFragment : Fragment(), Injectable {
     lateinit var executors: AppExecutors
     private lateinit var viewModel: HomeSpaceViewModel
 
+    private var PRIVATE_MODE = 0
+    private val PREF_NAME = "HomeSpacePref"
+    private val LIST_TYPE = "listType"
+    private var sharedPref: SharedPreferences? = null
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         requireActivity().title = getString(R.string.app_name)
+
+        sharedPref = requireActivity().getSharedPreferences(PREF_NAME, PRIVATE_MODE)
+
+        changeListType(sharedPref?.getString(LIST_TYPE, GRID_TYPE))
+
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(HomeSpaceViewModel::class.java)
+
 
         viewModel.init()
 
@@ -89,6 +103,10 @@ class HomeSpaceFragment : Fragment(), Injectable {
             it.lifecycleOwner = this
             it.recycler.adapter = adapter
         }
+
+
+
+
         initEntryList(viewModel)
     }
 
@@ -153,6 +171,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
             onActionCallback(HomeSpaceTable(), ACTION_NEW)
         }
 
+
         return binding.root
     }
 
@@ -161,6 +180,8 @@ class HomeSpaceFragment : Fragment(), Injectable {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
+
     }
 
 
@@ -170,18 +191,39 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.findItem(R.id.menuSearch)?.isVisible = true
+
+        menu.findItem(R.id.menuList)?.isVisible =
+            sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE
+
+        menu.findItem(R.id.menuGridList)?.isVisible =
+            sharedPref?.getString(LIST_TYPE, GRID_TYPE) == LINEAR_TYPE
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+
             R.id.menuSearch -> {
                 Logger.e(Thread.currentThread(), "search")
+            }
+
+            R.id.menuGridList -> {
+                changeListType(GRID_TYPE)
+                sharedPref?.edit()?.putString(LIST_TYPE, GRID_TYPE)?.apply()
+                requireActivity().invalidateOptionsMenu()
+            }
+
+            R.id.menuList -> {
+                changeListType(LINEAR_TYPE)
+                sharedPref?.edit()?.putString(LIST_TYPE, LINEAR_TYPE)?.apply()
+                requireActivity().invalidateOptionsMenu()
             }
         }
         return true
     }
 
     companion object {
+        const val GRID_TYPE = "grid"
+        const val LINEAR_TYPE = "linear"
         const val ACTION_CANCEL = -1
         const val ACTION_EDIT = "edit"
         const val ACTION_RENAME = 1
@@ -293,5 +335,25 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
         }
 
+    }
+
+    private fun changeListType(type: String?) {
+
+        when (type) {
+            GRID_TYPE -> {
+                binding.recycler.layoutManager =
+                    StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            }
+
+            LINEAR_TYPE -> {
+                binding.recycler.layoutManager =
+                    LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            }
+
+            else -> {
+                binding.recycler.layoutManager =
+                    StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            }
+        }
     }
 }

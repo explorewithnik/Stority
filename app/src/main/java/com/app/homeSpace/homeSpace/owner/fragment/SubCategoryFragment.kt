@@ -4,9 +4,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
@@ -15,6 +17,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.app.homeSpace.R
 import com.app.homeSpace.binding.FragmentDataBindingComponent
 import com.app.homeSpace.databinding.FragmentSubCategoryBinding
@@ -26,6 +30,8 @@ import com.app.homeSpace.remoteUtils.Status
 import com.app.homeSpace.homeSpace.data.SubCategoryTable
 import com.app.homeSpace.homeSpace.observer.SubCategoryViewModel
 import com.app.homeSpace.homeSpace.owner.adapter.SubCategoryAdapter
+import com.app.homeSpace.homeSpace.owner.fragment.HomeSpaceFragment.Companion.GRID_TYPE
+import com.app.homeSpace.homeSpace.owner.fragment.HomeSpaceFragment.Companion.LINEAR_TYPE
 import com.app.homeSpace.widget.AddSubCategoryDailog
 import com.app.homeSpace.widget.MultipleOptionDailogSubCategory
 import com.google.gson.Gson
@@ -43,13 +49,17 @@ class SubCategoryFragment : Fragment(), Injectable {
     lateinit var executors: AppExecutors
     private lateinit var viewModel: SubCategoryViewModel
 
+    private var PRIVATE_MODE = 0
+    private val PREF_NAME = "HomeSpacePref"
+    private val SUB_LIST_TYPE = "subListType"
+    private var sharedPref: SharedPreferences? = null
+
     private var entryId = ""
     private var text = ""
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(SubCategoryViewModel::class.java)
+
 
         entryId = savedInstanceState?.getString(entryId)
             ?: SubCategoryFragmentArgs.fromBundle(arguments!!).entryId
@@ -60,6 +70,13 @@ class SubCategoryFragment : Fragment(), Injectable {
         Logger.e(Thread.currentThread(), "text $text")
 
         requireActivity().title = text
+
+        sharedPref = requireActivity().getSharedPreferences(PREF_NAME, PRIVATE_MODE)
+        changeSubListType(sharedPref?.getString(SUB_LIST_TYPE, GRID_TYPE))
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
+            .get(SubCategoryViewModel::class.java)
+
 
         viewModel.init(entryId)
 
@@ -163,6 +180,13 @@ class SubCategoryFragment : Fragment(), Injectable {
             dataBindingComponent
         )
 
+        binding.fab.startAnimation(
+            AnimationUtils.loadAnimation(
+                requireContext(),
+                R.anim.rotate
+            )
+        )
+
         binding.fab.setOnClickListener {
             binding.fab.hide()
             onActionCallback(
@@ -189,12 +213,30 @@ class SubCategoryFragment : Fragment(), Injectable {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.findItem(R.id.subCategoryMenuSearch)?.isVisible = true
+
+        menu.findItem(R.id.menuList)?.isVisible =
+            sharedPref?.getString(SUB_LIST_TYPE, GRID_TYPE) == GRID_TYPE
+
+        menu.findItem(R.id.menuGridList)?.isVisible =
+            sharedPref?.getString(SUB_LIST_TYPE, GRID_TYPE) == LINEAR_TYPE
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.subCategoryMenuSearch -> {
                 Logger.e(Thread.currentThread(), "search")
+            }
+
+            R.id.menuGridList -> {
+                changeSubListType(GRID_TYPE)
+                sharedPref?.edit()?.putString(SUB_LIST_TYPE, GRID_TYPE)?.apply()
+                requireActivity().invalidateOptionsMenu()
+            }
+
+            R.id.menuList -> {
+                changeSubListType(LINEAR_TYPE)
+                sharedPref?.edit()?.putString(SUB_LIST_TYPE, LINEAR_TYPE)?.apply()
+                requireActivity().invalidateOptionsMenu()
             }
         }
         return true
@@ -316,5 +358,25 @@ class SubCategoryFragment : Fragment(), Injectable {
         super.onSaveInstanceState(outState)
         outState.putString(ENTRY_ID, entryId)
         outState.putString(TEXT_ID, text)
+    }
+
+    private fun changeSubListType(subType: String?) {
+
+        when (subType) {
+            GRID_TYPE -> {
+                binding.recycler.layoutManager =
+                    StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            }
+
+            LINEAR_TYPE -> {
+                binding.recycler.layoutManager =
+                    LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            }
+
+            else -> {
+                binding.recycler.layoutManager =
+                    StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            }
+        }
     }
 }

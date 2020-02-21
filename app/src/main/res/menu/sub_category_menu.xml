@@ -3,6 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menuGridList"
+        android:icon="@drawable/ic_grid_small"
+        android:title="@string/menu_list"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menuList"
+        android:icon="@drawable/ic_menu_list"
+        android:title="@string/menu_list"
+        app:showAsAction="ifRoom" />
+
+
+    <item
         android:title="@string/search"
         android:id="@+id/subCategoryMenuSearch"
         android:icon="@drawable/ic_search_white_24dp"
