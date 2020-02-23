@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
@@ -54,15 +55,15 @@ class HomeSpaceFragment : Fragment(), Injectable {
         changeListType(sharedPref?.getString(LIST_TYPE, GRID_TYPE))
 
         viewModel = ViewModelProviders.of(this, viewModelFactory)
-                .get(HomeSpaceViewModel::class.java)
+            .get(HomeSpaceViewModel::class.java)
 
 
         viewModel.init()
 
         adapter = HomeSpaceAdapter(
-                context = requireContext(),
-                dataBindingComponent = dataBindingComponent,
-                appExecutors = executors
+            context = requireContext(),
+            dataBindingComponent = dataBindingComponent,
+            appExecutors = executors
         ) { listData, action ->
             when (action) {
 
@@ -99,10 +100,28 @@ class HomeSpaceFragment : Fragment(), Injectable {
         binding.let {
             it.lifecycleOwner = this
             it.recycler.adapter = adapter
+            it.isFirstRun = isFirstRun
         }
 
 
+        if (isFirstRun == true && adapter.allListData.size == 0) {
 
+            binding.fab.startAnimation(
+                AnimationUtils.loadAnimation(
+                    requireContext(),
+                    R.anim.rotate
+                )
+            )
+
+            binding.cardViewText.startAnimation(
+                AnimationUtils.loadAnimation(
+                    requireContext(),
+                    R.anim.shake
+                )
+            )
+
+
+        }
 
         initEntryList(viewModel)
     }
@@ -141,8 +160,8 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
     private fun startProgress() {
         activity?.window?.setFlags(
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
         )
     }
 
@@ -151,36 +170,39 @@ class HomeSpaceFragment : Fragment(), Injectable {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
 
         binding = DataBindingUtil.inflate(
-                inflater,
-                R.layout.fragment_home_space,
-                container,
-                false,
-                dataBindingComponent
+            inflater,
+            R.layout.fragment_home_space,
+            container,
+            false,
+            dataBindingComponent
         )
 
         binding.fab.setOnClickListener {
+            if (binding.cardViewText.visibility == View.VISIBLE) {
+                binding.cardViewText.visibility = View.GONE
+            }
+
             binding.fab.hide()
             onActionCallback(HomeSpaceTable(), ACTION_NEW)
         }
 
-
         return binding.root
     }
 
-    fun navController() = findNavController()
+    private fun navController() = findNavController()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         sharedPref = (activity as HomeSpaceActivity).sharedPref
         isFirstRun = (activity as HomeSpaceActivity).isFirstRun
-        Logger.e(Thread.currentThread(), "firstTimeLaunch fragment $isFirstRun")
+        Logger.e(Thread.currentThread(), "firstTimeLaunch HomeSpaceFragment $isFirstRun")
     }
 
 
@@ -192,10 +214,13 @@ class HomeSpaceFragment : Fragment(), Injectable {
         menu.findItem(R.id.menuSearch)?.isVisible = true
         Logger.e(Thread.currentThread(), "itemCount  ${adapter.allListData.size}")
         menu.findItem(R.id.menuList)?.isVisible =
-                sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE && adapter.allListData.size > 0
+            sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE && adapter.allListData.size > 0
 
         menu.findItem(R.id.menuGridList)?.isVisible =
-                sharedPref?.getString(LIST_TYPE, GRID_TYPE) == LINEAR_TYPE && adapter.allListData.size > 0
+            sharedPref?.getString(
+                LIST_TYPE,
+                GRID_TYPE
+            ) == LINEAR_TYPE && adapter.allListData.size > 0
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -243,33 +268,33 @@ class HomeSpaceFragment : Fragment(), Injectable {
         when (action) {
             ACTION_NEW -> {
                 AddDataDailog(
-                        context = requireContext(),
-                        data = data,
-                        action = action,
-                        dataBindingComponent = dataBindingComponent,
-                        onSaveCallback = this::onSaveCallback,
-                        onCancelCallback = this::onCancelCallback
+                    context = requireContext(),
+                    data = data,
+                    action = action,
+                    dataBindingComponent = dataBindingComponent,
+                    onSaveCallback = this::onSaveCallback,
+                    onCancelCallback = this::onCancelCallback
                 ).show()
             }
 
             ACTION_RENAME -> {
                 AddDataDailog(
-                        context = requireContext(),
-                        data = data,
-                        action = action,
-                        dataBindingComponent = dataBindingComponent,
-                        onSaveCallback = this::onSaveCallback,
-                        onCancelCallback = this::onCancelCallback
+                    context = requireContext(),
+                    data = data,
+                    action = action,
+                    dataBindingComponent = dataBindingComponent,
+                    onSaveCallback = this::onSaveCallback,
+                    onCancelCallback = this::onCancelCallback
                 ).show()
 
             }
 
             ACTION_MORE_INT -> {
                 MultipleOptionDailog(
-                        context = requireContext(),
-                        data = data,
-                        onMoreActionCalback = this::onMoreActionCallback,
-                        onCancelCallback = this::onCancelCallback
+                    context = requireContext(),
+                    data = data,
+                    onMoreActionCalback = this::onMoreActionCallback,
+                    onCancelCallback = this::onCancelCallback
                 ).show()
             }
         }
@@ -311,7 +336,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
         when (action) {
             ACTION_COPY -> {
                 val clipboard =
-                        requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+                    requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
                 val clip = ClipData.newPlainText("label", data?.text)
                 clipboard?.setPrimaryClip(clip)
 
@@ -342,17 +367,17 @@ class HomeSpaceFragment : Fragment(), Injectable {
         when (type) {
             GRID_TYPE -> {
                 binding.recycler.layoutManager =
-                        StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+                    StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             }
 
             LINEAR_TYPE -> {
                 binding.recycler.layoutManager =
-                        LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+                    LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             }
 
             else -> {
                 binding.recycler.layoutManager =
-                        StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+                    StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             }
         }
     }

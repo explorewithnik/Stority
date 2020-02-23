@@ -24,6 +24,10 @@
         <variable
             name="status"
             type="com.app.stority.remoteUtils.Status" />
+
+        <variable
+            name="isFirstRun"
+            type="Boolean" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -45,6 +49,15 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
+        <include
+            android:id="@+id/empty_view"
+            layout="@layout/empty_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{count != null &amp;&amp; count > 0 &amp;&amp; status != Status.LOADING ? View.GONE : View.VISIBLE,default=gone}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/progress"
+            />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"
             android:layout_width="match_parent"
@@ -60,16 +73,55 @@
             app:spanCount="2"
             tool:listitem="@layout/adapter_sub_category" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="@dimen/fab_margin"
-            app:elevation="6dp"
-            app:fabSize="normal"
-            app:srcCompat="@drawable/ic_add_white_24dp" />
 
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/fab_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end">
+
+            <com.google.android.material.circularreveal.cardview.CircularRevealCardView
+                android:id="@+id/cardViewText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:clickable="true"
+                android:contentDescription="@string/select_all"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:visibility='@{isFirstRun &amp;&amp; count == 0? View.VISIBLE : View.GONE,default=gone}'
+                app:cardCornerRadius="5dp"
+                app:layout_constraintBottom_toBottomOf="@id/fab"
+                app:layout_constraintEnd_toStartOf="@id/fab"
+                app:layout_constraintTop_toTopOf="@id/fab"
+                app:rippleColor="@color/app_theme_color">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="7dp"
+                    android:text="@string/add_first_note_point"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+            </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin"
+                android:contentDescription="@string/add_sub_category_data_dialog_title"
+                app:elevation="6dp"
+                app:fabSize="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:srcCompat="@drawable/ic_add_white_24dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>

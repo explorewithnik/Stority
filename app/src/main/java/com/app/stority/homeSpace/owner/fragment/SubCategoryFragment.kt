@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.app.stority.R
@@ -25,12 +24,14 @@ import com.app.stority.di.Injectable
 import com.app.stority.helper.AppExecutors
 import com.app.stority.helper.Logger
 import com.app.stority.helper.autoCleared
-import com.app.stority.remoteUtils.Status
 import com.app.stority.homeSpace.data.SubCategoryTable
 import com.app.stority.homeSpace.observer.SubCategoryViewModel
+import com.app.stority.homeSpace.owner.activity.HomeSpaceActivity
+import com.app.stority.homeSpace.owner.activity.HomeSpaceActivity.Companion.FIRST_TIME_LAUNCH_2
 import com.app.stority.homeSpace.owner.adapter.SubCategoryAdapter
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.GRID_TYPE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.LINEAR_TYPE
+import com.app.stority.remoteUtils.Status
 import com.app.stority.widget.AddSubCategoryDailog
 import com.app.stority.widget.MultipleOptionDailogSubCategory
 import com.google.gson.Gson
@@ -46,10 +47,7 @@ class SubCategoryFragment : Fragment(), Injectable {
     @Inject
     lateinit var executors: AppExecutors
     private lateinit var viewModel: SubCategoryViewModel
-
-    private var PRIVATE_MODE = 0
-    private val PREF_NAME = "HomeSpacePref"
-    private val SUB_LIST_TYPE = "subListType"
+    private var isFirstRun: Boolean? = null
     private var sharedPref: SharedPreferences? = null
 
     private var entryId = ""
@@ -69,8 +67,7 @@ class SubCategoryFragment : Fragment(), Injectable {
 
         requireActivity().title = text
 
-        sharedPref = requireActivity().getSharedPreferences(PREF_NAME, PRIVATE_MODE)
-        changeSubListType(sharedPref?.getString(SUB_LIST_TYPE, GRID_TYPE))
+        changeSubListType(sharedPref?.getString(entryId, GRID_TYPE))
 
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(SubCategoryViewModel::class.java)
@@ -92,6 +89,7 @@ class SubCategoryFragment : Fragment(), Injectable {
 
                 ACTION_DELETE -> {
                     viewModel.deleteSubCategoryListData(list = listData)
+                    requireActivity().invalidateOptionsMenu()
                 }
 
                 ACTION_FAB_SHOW -> {
@@ -113,13 +111,19 @@ class SubCategoryFragment : Fragment(), Injectable {
         binding.let {
             it.lifecycleOwner = this
             it.recycler.adapter = adapter
+            it.isFirstRun = isFirstRun
         }
+
+        if (isFirstRun == true && adapter.allListData.size == 0) {
+            binding.cardViewText.startAnimation(
+                AnimationUtils.loadAnimation(
+                    requireContext(),
+                    R.anim.shake
+                )
+            )
+        }
+
         initEntryList(viewModel)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
     }
 
     private fun initEntryList(viewModel: SubCategoryViewModel) {
@@ -150,6 +154,7 @@ class SubCategoryFragment : Fragment(), Injectable {
                     startProgress()
                 }
             }
+            requireActivity().invalidateOptionsMenu()
         })
     }
 
@@ -196,12 +201,19 @@ class SubCategoryFragment : Fragment(), Injectable {
         return binding.root
     }
 
-    fun navController() = findNavController()
+//    fun navController() = findNavController()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        sharedPref = (activity as HomeSpaceActivity).sharedPref
 
+        isFirstRun = sharedPref?.getBoolean(FIRST_TIME_LAUNCH_2, true) ?: true
+
+        if (isFirstRun == true) {
+            sharedPref?.edit()?.putBoolean(FIRST_TIME_LAUNCH_2, false)?.apply()
+        }
+        Logger.e(Thread.currentThread(), "firstTimeLaunch SubCategoryFragment $isFirstRun")
     }
 
 
@@ -213,10 +225,16 @@ class SubCategoryFragment : Fragment(), Injectable {
         menu.findItem(R.id.subCategoryMenuSearch)?.isVisible = true
 
         menu.findItem(R.id.menuList)?.isVisible =
-            sharedPref?.getString(SUB_LIST_TYPE, GRID_TYPE) == GRID_TYPE
+            sharedPref?.getString(
+                entryId,
+                GRID_TYPE
+            ) == GRID_TYPE && adapter.allListData.size > 0
 
         menu.findItem(R.id.menuGridList)?.isVisible =
-            sharedPref?.getString(SUB_LIST_TYPE, GRID_TYPE) == LINEAR_TYPE
+            sharedPref?.getString(
+                entryId,
+                GRID_TYPE
+            ) == LINEAR_TYPE && adapter.allListData.size > 0
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -227,13 +245,13 @@ class SubCategoryFragment : Fragment(), Injectable {
 
             R.id.menuGridList -> {
                 changeSubListType(GRID_TYPE)
-                sharedPref?.edit()?.putString(SUB_LIST_TYPE, GRID_TYPE)?.apply()
+                sharedPref?.edit()?.putString(entryId, GRID_TYPE)?.apply()
                 requireActivity().invalidateOptionsMenu()
             }
 
             R.id.menuList -> {
                 changeSubListType(LINEAR_TYPE)
-                sharedPref?.edit()?.putString(SUB_LIST_TYPE, LINEAR_TYPE)?.apply()
+                sharedPref?.edit()?.putString(entryId, LINEAR_TYPE)?.apply()
                 requireActivity().invalidateOptionsMenu()
             }
         }
@@ -377,4 +395,5 @@ class SubCategoryFragment : Fragment(), Injectable {
             }
         }
     }
+
 }
