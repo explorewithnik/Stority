@@ -3,14 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:orderInCategory="100"
         android:id="@+id/menuGridList"
         android:icon="@drawable/ic_grid_small"
         android:title="@string/menu_list"
         app:showAsAction="ifRoom" />
 
     <item
+        android:orderInCategory="100"
         android:id="@+id/menuList"
-        android:icon="@drawable/ic_menu_list"
+        android:icon="@drawable/ic_list"
         android:title="@string/menu_list"
         app:showAsAction="ifRoom" />
 
@@ -19,7 +21,7 @@
         android:title="@string/search"
         android:id="@+id/subCategoryMenuSearch"
         android:icon="@drawable/ic_search_white_24dp"
-        android:orderInCategory="100"
+        android:orderInCategory="101"
         app:showAsAction="ifRoom" />
 
 </menu>

@@ -6,7 +6,7 @@
 
         <variable
             name="data"
-            type="com.app.homeSpace.homeSpace.data.HomeSpaceTable" />
+            type="com.app.stority.homeSpace.data.HomeSpaceTable" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

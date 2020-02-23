@@ -5,11 +5,11 @@
 
         <import type="android.view.View" />
 
-        <import type="com.app.homeSpace.remoteUtils.Status" />
+        <import type="com.app.stority.remoteUtils.Status" />
 
         <variable
             name="resource"
-            type="com.app.homeSpace.remoteUtils.Resource" />
+            type="com.app.stority.remoteUtils.Resource" />
     </data>
 
     <FrameLayout

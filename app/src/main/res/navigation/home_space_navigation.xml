@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeSpaceFragment"
-        android:name="com.app.homeSpace.homeSpace.owner.fragment.HomeSpaceFragment"
+        android:name="com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment"
         android:label="homeSpaceFragment"
         tools:layout="@layout/fragment_home_space">
 
@@ -21,7 +21,7 @@
 
     <fragment
         android:id="@+id/SubCategoryFragment"
-        android:name="com.app.homeSpace.homeSpace.owner.fragment.SubCategoryFragment"
+        android:name="com.app.stority.homeSpace.owner.fragment.SubCategoryFragment"
         android:label="SubCategoryFragment"
         tools:layout="@layout/fragment_sub_category">
 

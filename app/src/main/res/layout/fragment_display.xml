@@ -31,7 +31,7 @@
             android:fitsSystemWindows="true"
             tools:context=".displayImage.DisplayFragment">
 
-        <com.app.homeSpace.widget.ZoomageView
+        <com.app.stority.widget.ZoomageView
                 android:id="@+id/imageView"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
