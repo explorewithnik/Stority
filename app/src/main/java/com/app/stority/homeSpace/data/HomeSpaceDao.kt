@@ -43,6 +43,9 @@ interface HomeSpaceDao {
     @Query("DELETE FROM HomeSpaceTable WHERE id =:id")
     fun deleteHomeSpaceData(id: Int?)
 
+    @Delete
+    fun deleteAllHomeSpaceData(data: HomeSpaceTable?)
+
     @Query("DELETE FROM SubCategoryTable WHERE subCategoryId =:id")
     fun deleteSubCategoryData(id: Int?)
 

@@ -21,7 +21,7 @@
         android:theme="@style/MTRLThemeLight">
 
         <activity android:name=".homeSpace.owner.activity.HomeSpaceActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:label="@string/home_space"
             >
             <intent-filter>

@@ -33,7 +33,9 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tool:context=".homeSpace.owner.activity.HomeSpaceActivity">
+        android:forceDarkAllowed="true"
+        tool:context=".homeSpace.owner.activity.HomeSpaceActivity"
+        tool:targetApi="q">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
@@ -52,7 +54,6 @@
         </com.google.android.material.appbar.AppBarLayout>
 
 
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"
             android:layout_width="match_parent"
@@ -61,6 +62,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
+            android:layoutAnimation="@anim/layout_animation_fall_down"
             app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -75,57 +77,21 @@
             android:layout_height="match_parent"
             android:visibility="@{count != null &amp;&amp; count > 0 &amp;&amp; status != Status.LOADING ? View.GONE : View.VISIBLE,default=gone}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/progress"
-            />
+            app:layout_constraintTop_toBottomOf="@id/progress" />
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/fab_text"
-            android:layout_width="match_parent"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end">
-
-            <com.google.android.material.circularreveal.cardview.CircularRevealCardView
-                android:id="@+id/cardViewText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:clickable="true"
-                android:contentDescription="@string/select_all"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:visibility='@{isFirstRun &amp;&amp; count == 0? View.VISIBLE : View.GONE,default=gone}'
-                app:cardCornerRadius="5dp"
-                app:layout_constraintBottom_toBottomOf="@id/fab"
-                app:layout_constraintEnd_toStartOf="@id/fab"
-                app:layout_constraintTop_toTopOf="@id/fab"
-                app:rippleColor="@color/app_theme_color">
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="7dp"
-                    android:text="@string/add_first_note"
-                    android:textColor="@color/black"
-                    android:textStyle="bold" />
-            </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
-
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:contentDescription="@string/add_sub_category_data_dialog_title"
-                app:elevation="6dp"
-                app:fabSize="normal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/ic_add_white_24dp" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:contentDescription="@string/add_sub_category_data_dialog_title"
+            app:elevation="6dp"
+            app:fabSize="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_add_white_24dp" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

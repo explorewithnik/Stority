@@ -4,13 +4,14 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.os.Build
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDex
 import com.app.stority.di.AppInjector
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import javax.inject.Inject
-
 
 /**
  * Application File for request queues of volley.
@@ -26,10 +27,14 @@ class AppController : Application(), HasActivityInjector {
     override fun onCreate() {
         super.onCreate()
         AppInjector.init(this)
-//        Fabric.with(this, Crashlytics())
         context = applicationContext
         instance = this
         appInitialization()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY)
+        }
     }
 
     override fun attachBaseContext(base: Context) {
@@ -59,7 +64,5 @@ class AppController : Application(), HasActivityInjector {
         @SuppressLint("StaticFieldLeak")
         @get:Synchronized
         lateinit var instance: AppController
-
     }
-
 }

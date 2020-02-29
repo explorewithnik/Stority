@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.app.stority.helper.Logger
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.repo.HomeSpaceRepository
 import com.app.stority.remoteUtils.AbsentLiveData
@@ -48,12 +49,24 @@ class HomeSpaceViewModel @Inject constructor(
         }
     }
 
-    fun init() {
-        apiCall.value = "1"
+    fun init(value: String): Boolean {
+        Logger.e(Thread.currentThread(), "value")
+        return if (apiCall.value == value) {
+            true
+        } else {
+            Logger.e(Thread.currentThread(), "init")
+            apiCall.value = value
+            false
+        }
+
     }
 
     fun deleteHomeSpaceData(data: HomeSpaceTable?) {
         repo.deleteHomeSpaceData(data = data)
+    }
+
+    fun deleteAllHomeSpaceData() {
+        repo.deleteAllHomeSpaceData()
     }
 
     fun deleteHomeSpaceListData(list: List<HomeSpaceTable?>) {

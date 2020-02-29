@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
+import android.view.animation.Animation
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
@@ -16,6 +17,7 @@ import com.app.stority.R
 import com.app.stority.databinding.AdapterHomeSpaceBinding
 import com.app.stority.helper.AppExecutors
 import com.app.stority.helper.DataBoundListAdapter
+import com.app.stority.helper.Logger
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ALL
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_DELETE
@@ -23,10 +25,14 @@ import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTI
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_SHOW
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_MORE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ROOT
+import com.app.tooltip.ClosePolicy
+import com.app.tooltip.Tooltip
+import com.app.tooltip.Typefaces
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 
 
 class HomeSpaceAdapter(
+    private var isFirstRun: Boolean?,
     private val context: Context,
     private val dataBindingComponent: DataBindingComponent,
     val appExecutors: AppExecutors,
@@ -45,7 +51,7 @@ class HomeSpaceAdapter(
         }
     }
 ) {
-
+    var tooltip: Tooltip? = null
     var allListData = ArrayList<HomeSpaceTable?>()
     private var showAddAllMenuIcon = false
     private var showRemoveAllMenuIcon = false
@@ -73,7 +79,7 @@ class HomeSpaceAdapter(
             cardViewList.add(binding.cv)
         }
 
-        binding.more?.setOnClickListener {
+        binding.more.setOnClickListener {
             binding.data?.let { data ->
 
                 callback?.invoke(listOf(data), ACTION_MORE)
@@ -167,6 +173,38 @@ class HomeSpaceAdapter(
             binding?.cv?.strokeColor = Color.TRANSPARENT
             binding?.cv?.strokeWidth = 0
             binding?.cv?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+        }
+
+        Logger.e(Thread.currentThread(), "isFirstRun $isFirstRun")
+
+        if (cardViewList.isNotEmpty() && cardViewList.size == 1 && isFirstRun == true) {
+            binding?.cv?.post {
+                val metrics = context.resources.displayMetrics
+                tooltip = Tooltip.Builder(context)
+                    .anchor(binding.cv, 0, 0, true)
+                    .text("tap on card to add points")
+                    .styleId(R.style.ToolTipAltStyle)
+                    .typeface(Typefaces[context, "font/roboto.ttf"])
+                    .maxWidth(metrics.widthPixels / 2)
+                    .arrow(true)
+                    .floatingAnimation(Tooltip.Animation.DEFAULT)
+                    .closePolicy(ClosePolicy.TOUCH_ANYWHERE_NO_CONSUME)
+                    .showDuration(Animation.INFINITE.toLong())
+                    .overlay(true)
+                    .create()
+
+                tooltip?.doOnHidden {
+                    tooltip = null
+                }
+                    ?.doOnFailure {
+
+                    }
+                    ?.doOnShown {
+
+                    }
+
+                    ?.show(binding.cv, Tooltip.Gravity.RIGHT, true)
+            }
         }
 
         binding?.root?.setOnClickListener {

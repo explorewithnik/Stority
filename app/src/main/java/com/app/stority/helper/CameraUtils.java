@@ -15,7 +15,6 @@ import android.widget.Toast;
 import androidx.exifinterface.media.ExifInterface;
 
 import com.app.stority.R;
-import com.crashlytics.android.Crashlytics;
 
 
 import java.io.BufferedOutputStream;
@@ -125,14 +124,14 @@ public class CameraUtils {
             } catch (FileNotFoundException e) {
                 if (Constants.DEBUG_MODE)
                     e.printStackTrace();
-                Crashlytics.logException(e);
+//                Crashlytics.logException(e);
                 Logger.e(Thread.currentThread(), "1. catch exception mCompressedPath_is: " + e.toString());
                 Toast.makeText(activity, activity.getString(R.string.imageSaveFailed), Toast.LENGTH_SHORT).show();
                 return null;
             } catch (IOException e) {
                 if (Constants.DEBUG_MODE)
                     e.printStackTrace();
-                Crashlytics.logException(e);
+//                Crashlytics.logException(e);
                 Toast.makeText(activity, activity.getString(R.string.imageSaveFailed), Toast.LENGTH_SHORT).show();
                 Logger.e(Thread.currentThread(), "2. catch exception mCompressedPath_is: " + e.toString());
                 return null;

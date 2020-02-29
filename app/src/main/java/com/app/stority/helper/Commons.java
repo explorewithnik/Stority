@@ -462,21 +462,6 @@ public class Commons {
         return null;
     }
 
-    //flash control
-    public int handleFlash(ImageButton imageButtonFlash) {
-        if (FLASH_VALUE == 0) {
-            imageButtonFlash.setImageDrawable(cameraInterface.getActivity().getResources().getDrawable(R.drawable.avd_flash_on_dark));
-            FLASH_VALUE = 1;
-            setCameraParameters();
-
-        } else {
-            imageButtonFlash.setImageDrawable(cameraInterface.getActivity().getResources().getDrawable(R.drawable.avd_flash_off_dark));
-            FLASH_VALUE = 0;
-            setCameraParameters();
-        }
-        return FLASH_VALUE;
-    }
-
     //get camera details
     public CameraProvider getExifInterface(String path, int orientation, String accx, String accy, String accz) {
         // extracting information from actual image

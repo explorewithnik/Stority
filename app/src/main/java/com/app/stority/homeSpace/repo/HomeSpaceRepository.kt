@@ -72,6 +72,10 @@ class HomeSpaceRepository @Inject constructor(
     fun deleteHomeSpaceData(data: HomeSpaceTable?) =
         executor.diskIO().execute { dao.deleteHomeSpaceData(id = data?.id) }
 
+    fun deleteAllHomeSpaceData() = executor.diskIO().execute {
+        dao.deleteHomeSpaceAllData()
+    }
+
     fun deleteHomeSpaceDataList(list: List<HomeSpaceTable?>) {
         list.forEach {
             executor.diskIO().execute {

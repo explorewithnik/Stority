@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.databinding.DataBindingComponent
@@ -32,11 +33,15 @@ import com.app.stority.homeSpace.owner.adapter.HomeSpaceAdapter
 import com.app.stority.remoteUtils.Status
 import com.app.stority.widget.AddDataDailog
 import com.app.stority.widget.MultipleOptionDailog
+import com.app.tooltip.ClosePolicy
+import com.app.tooltip.Tooltip
+import com.app.tooltip.Typefaces
 import com.google.gson.Gson
 import javax.inject.Inject
 
 
 class HomeSpaceFragment : Fragment(), Injectable {
+    var tooltip: Tooltip? = null
     var binding by autoCleared<FragmentHomeSpaceBinding>()
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
     private var adapter by autoCleared<HomeSpaceAdapter>()
@@ -45,22 +50,24 @@ class HomeSpaceFragment : Fragment(), Injectable {
     @Inject
     lateinit var executors: AppExecutors
     private lateinit var viewModel: HomeSpaceViewModel
-    private var isFirstRun: Boolean? = null
+    private var isFirstRun: Boolean = false
     private var sharedPref: SharedPreferences? = null
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         requireActivity().title = getString(R.string.app_name)
-
+        Logger.e(Thread.currentThread(), "onActivityCreated")
         changeListType(sharedPref?.getString(LIST_TYPE, GRID_TYPE))
 
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(HomeSpaceViewModel::class.java)
 
-
-        viewModel.init()
+        val stopAnim = viewModel.init(value = "1")
+        if (stopAnim) isFirstRun = false //stopping tooltip anim when coming back from sub category frag
 
         adapter = HomeSpaceAdapter(
+            isFirstRun = isFirstRun,
             context = requireContext(),
             dataBindingComponent = dataBindingComponent,
             appExecutors = executors
@@ -103,31 +110,11 @@ class HomeSpaceFragment : Fragment(), Injectable {
             it.isFirstRun = isFirstRun
         }
 
-
-        if (isFirstRun == true && adapter.allListData.size == 0) {
-
-            binding.fab.startAnimation(
-                AnimationUtils.loadAnimation(
-                    requireContext(),
-                    R.anim.rotate
-                )
-            )
-
-            binding.cardViewText.startAnimation(
-                AnimationUtils.loadAnimation(
-                    requireContext(),
-                    R.anim.shake
-                )
-            )
-
-
-        }
-
         initEntryList(viewModel)
     }
 
     private fun initEntryList(viewModel: HomeSpaceViewModel) {
-        viewModel.result.observe(this, Observer { listResource ->
+        viewModel.result.observe(viewLifecycleOwner, Observer { listResource ->
             binding.count = listResource?.data?.size
             binding.status = listResource?.status
             endProgress()
@@ -184,10 +171,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
         )
 
         binding.fab.setOnClickListener {
-            if (binding.cardViewText.visibility == View.VISIBLE) {
-                binding.cardViewText.visibility = View.GONE
-            }
-
             binding.fab.hide()
             onActionCallback(HomeSpaceTable(), ACTION_NEW)
         }
@@ -201,7 +184,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         sharedPref = (activity as HomeSpaceActivity).sharedPref
-        isFirstRun = (activity as HomeSpaceActivity).isFirstRun
+        isFirstRun = (activity as HomeSpaceActivity).isFirstRun ?: false
         Logger.e(Thread.currentThread(), "firstTimeLaunch HomeSpaceFragment $isFirstRun")
     }
 
@@ -228,6 +211,9 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
             R.id.menuSearch -> {
                 Logger.e(Thread.currentThread(), "search")
+                viewModel.deleteAllHomeSpaceData()
+                sharedPref?.edit()?.clear()?.apply()
+                adapter.notifyDataSetChanged()
             }
 
             R.id.menuGridList -> {
@@ -381,4 +367,51 @@ class HomeSpaceFragment : Fragment(), Injectable {
             }
         }
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        //it will let tooltip run else tooltip won't run
+        binding.fab.post {
+
+            if (isFirstRun && adapter.allListData.size == 0) {
+
+                binding.fab.startAnimation(
+                    AnimationUtils.loadAnimation(
+                        requireContext(),
+                        R.anim.rotate
+                    )
+                )
+
+                val metrics = resources.displayMetrics
+                tooltip = Tooltip.Builder(requireContext())
+                    .anchor(binding.fab, 0, 0, true)
+                    .text("add your first note")
+                    .styleId(R.style.ToolTipAltStyle)
+                    .typeface(Typefaces[requireContext(), "font/roboto.ttf"])
+                    .maxWidth(metrics.widthPixels / 2)
+                    .arrow(true)
+                    .floatingAnimation(Tooltip.Animation.DEFAULT)
+                    .closePolicy(ClosePolicy.TOUCH_ANYWHERE_NO_CONSUME)
+                    .showDuration(Animation.INFINITE.toLong())
+                    .overlay(false)
+                    .create()
+
+                tooltip?.doOnHidden {
+                    tooltip = null
+                }
+                    ?.doOnFailure {
+
+                    }
+                    ?.doOnShown {
+
+                    }
+
+                    ?.show(binding.fab, Tooltip.Gravity.LEFT, true)
+
+            }
+        }
+    }
+
+
 }

@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'jacoco'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'androidx.navigation.safeargs'
@@ -15,7 +14,6 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         dataBinding.enabled = true
         multiDexEnabled true
 
@@ -59,15 +57,14 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    // crashlytics dependency
-    implementation('com.crashlytics.sdk.android:crashlytics:2.9.8@aar') {
-        transitive = true
-    }
 
     // kotlin
     implementation deps.kotlin.stdlib
@@ -90,8 +87,8 @@ dependencies {
     // room dependency
     implementation deps.room.runtime
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
     kapt(deps.room.compiler, {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -130,16 +127,10 @@ dependencies {
     // glide dependency
     implementation deps.glide
 
-    // lottie dependency
-    implementation deps.lottie
-
     // Android Debug dependency
     debugImplementation deps.debug_implementation
 
-
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation project(":tooltip")
 }
 
 

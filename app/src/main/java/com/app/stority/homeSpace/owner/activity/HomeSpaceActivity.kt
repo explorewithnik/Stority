@@ -21,6 +21,7 @@ class HomeSpaceActivity : AppCompatActivity(), HasSupportFragmentInjector {
     var sharedPref: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_space)
 

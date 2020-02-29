@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.databinding.DataBindingComponent
@@ -34,11 +35,15 @@ import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.LINE
 import com.app.stority.remoteUtils.Status
 import com.app.stority.widget.AddSubCategoryDailog
 import com.app.stority.widget.MultipleOptionDailogSubCategory
+import com.app.tooltip.ClosePolicy
+import com.app.tooltip.Tooltip
+import com.app.tooltip.Typefaces
 import com.google.gson.Gson
 import javax.inject.Inject
 
 
 class SubCategoryFragment : Fragment(), Injectable {
+    private var tooltip: Tooltip? = null
     var binding by autoCleared<FragmentSubCategoryBinding>()
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
     private var adapter by autoCleared<SubCategoryAdapter>()
@@ -114,20 +119,12 @@ class SubCategoryFragment : Fragment(), Injectable {
             it.isFirstRun = isFirstRun
         }
 
-        if (isFirstRun == true && adapter.allListData.size == 0) {
-            binding.cardViewText.startAnimation(
-                AnimationUtils.loadAnimation(
-                    requireContext(),
-                    R.anim.shake
-                )
-            )
-        }
 
         initEntryList(viewModel)
     }
 
     private fun initEntryList(viewModel: SubCategoryViewModel) {
-        viewModel.result.observe(this, Observer { listResource ->
+        viewModel.result.observe(viewLifecycleOwner, Observer { listResource ->
             binding.count = listResource?.data?.size
             binding.status = listResource?.status
             endProgress()
@@ -394,6 +391,53 @@ class SubCategoryFragment : Fragment(), Injectable {
                     StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        //it will let tooltip run else tooltip won't run
+        binding.fab.post {
+
+            if (isFirstRun == true && adapter.allListData.size == 0) {
+
+                binding.fab.startAnimation(
+                    AnimationUtils.loadAnimation(
+                        requireContext(),
+                        R.anim.rotate
+                    )
+                )
+
+                val metrics = resources.displayMetrics
+                tooltip = Tooltip.Builder(requireContext())
+                    .anchor(binding.fab, 0, 0, false)
+                    .text("add points from here")
+                    .styleId(R.style.ToolTipAltStyle)
+                    .typeface(Typefaces[requireContext(), "font/roboto.ttf"])
+                    .maxWidth(metrics.widthPixels / 2)
+                    .arrow(true)
+                    .floatingAnimation(Tooltip.Animation.DEFAULT)
+                    .closePolicy(ClosePolicy.TOUCH_ANYWHERE_NO_CONSUME)
+                    .showDuration(Animation.INFINITE.toLong())
+                    .overlay(false)
+                    .create()
+
+                tooltip?.doOnHidden {
+                    tooltip = null
+                }
+                    ?.doOnFailure {
+
+                    }
+                    ?.doOnShown {
+
+                    }
+
+                    ?.show(binding.fab, Tooltip.Gravity.LEFT, true)
+
+            }
+        }
+
+
     }
 
 }
