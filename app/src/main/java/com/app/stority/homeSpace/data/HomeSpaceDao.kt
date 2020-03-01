@@ -31,7 +31,7 @@ interface HomeSpaceDao {
     @Query("SELECT * FROM HomeSpaceTable ORDER BY timeStamp DESC")
     fun fetchAllHomeSpaceData(): LiveData<List<HomeSpaceTable>>
 
-    @Query("SELECT * FROM SubCategoryTable ORDER BY timeStamp DESC")
+    @Query("SELECT * FROM SubCategoryTable")
     fun fetchAllSubCategoryData(): LiveData<List<SubCategoryTable>>
 
     @Query("SELECT * FROM SubCategoryTable WHERE id=:id ORDER BY timeStamp DESC")

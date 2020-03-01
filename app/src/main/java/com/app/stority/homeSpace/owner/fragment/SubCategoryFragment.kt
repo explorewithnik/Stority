@@ -6,6 +6,7 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -133,6 +134,7 @@ class SubCategoryFragment : Fragment(), Injectable {
                     endProgress()
                     if (listResource.data != null) {
                         adapter.submitList(listResource.data)
+                        binding.recycler.smoothScrollToPosition(0)
                         adapter.allListData.clear()
                         adapter.allListData.addAll(listResource.data)
                     } else {
@@ -311,7 +313,6 @@ class SubCategoryFragment : Fragment(), Injectable {
     }
 
     private fun onSaveCallback(data: SubCategoryTable?, action: Int) {
-
         when (action) {
             ACTION_RENAME -> {
                 viewModel.updateSubCategory(data)
@@ -320,9 +321,13 @@ class SubCategoryFragment : Fragment(), Injectable {
 
             ACTION_NEW -> {
                 if (!data?.text.isNullOrBlank()) {
+                    Logger.e(
+                        Thread.currentThread(),
+                        "count ${binding.recycler.smoothScrollToPosition(0)}"
+                    )
                     adapter.allListData.clear()
-                    binding.recycler.smoothScrollToPosition(binding.count!!)
                     viewModel.insertSubCategory(entryId, data)
+                    smoothScroll()
                 }
             }
         }
@@ -438,6 +443,13 @@ class SubCategoryFragment : Fragment(), Injectable {
         }
 
 
+    }
+
+    private fun smoothScroll() {
+        Handler().postDelayed({
+            if (isVisible)
+                binding.recycler.smoothScrollToPosition(0)
+        }, 200)
     }
 
 }

@@ -6,10 +6,12 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.annotation.NonNull
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -18,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.app.stority.R
 import com.app.stority.binding.FragmentDataBindingComponent
@@ -39,7 +42,6 @@ import com.app.tooltip.Typefaces
 import com.google.gson.Gson
 import javax.inject.Inject
 
-
 class HomeSpaceFragment : Fragment(), Injectable {
     var tooltip: Tooltip? = null
     var binding by autoCleared<FragmentHomeSpaceBinding>()
@@ -53,7 +55,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
     private var isFirstRun: Boolean = false
     private var sharedPref: SharedPreferences? = null
 
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         requireActivity().title = getString(R.string.app_name)
@@ -64,7 +65,8 @@ class HomeSpaceFragment : Fragment(), Injectable {
             .get(HomeSpaceViewModel::class.java)
 
         val stopAnim = viewModel.init(value = "1")
-        if (stopAnim) isFirstRun = false //stopping tooltip anim when coming back from sub category frag
+        if (stopAnim) isFirstRun =
+            false //stopping tooltip anim when coming back from sub category frag
 
         adapter = HomeSpaceAdapter(
             isFirstRun = isFirstRun,
@@ -122,6 +124,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
                 Status.SUCCESS -> {
                     endProgress()
                     if (listResource.data != null) {
+                        Logger.e(Thread.currentThread(), "when")
                         adapter.submitList(listResource.data)
                         adapter.allListData.clear()
                         adapter.allListData.addAll(listResource.data)
@@ -175,6 +178,8 @@ class HomeSpaceFragment : Fragment(), Injectable {
             onActionCallback(HomeSpaceTable(), ACTION_NEW)
         }
 
+
+
         return binding.root
     }
 
@@ -187,7 +192,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
         isFirstRun = (activity as HomeSpaceActivity).isFirstRun ?: false
         Logger.e(Thread.currentThread(), "firstTimeLaunch HomeSpaceFragment $isFirstRun")
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.home_space_menu, menu)
@@ -272,7 +276,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     onSaveCallback = this::onSaveCallback,
                     onCancelCallback = this::onCancelCallback
                 ).show()
-
             }
 
             ACTION_MORE_INT -> {
@@ -292,9 +295,8 @@ class HomeSpaceFragment : Fragment(), Injectable {
             ACTION_NEW -> {
                 if (!data?.text.isNullOrBlank()) {
                     adapter.allListData.clear()
-                    adapter.notifyDataSetChanged()
                     viewModel.insertCategory(data)
-                    binding.recycler.smoothScrollToPosition(0)
+                    smoothScroll()
                 }
             }
 
@@ -308,6 +310,12 @@ class HomeSpaceFragment : Fragment(), Injectable {
         binding.fab.show()
     }
 
+    private fun smoothScroll() {
+        Handler().postDelayed({
+            if (isVisible)
+                binding.recycler.smoothScrollToPosition(0)
+        }, 200)
+    }
 
     private fun onCancelCallback(action: Int) {
         when (action) {
@@ -411,7 +419,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
             }
         }
+
+
     }
-
-
 }
