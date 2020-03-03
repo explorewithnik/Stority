@@ -17,11 +17,11 @@
         app:showAsAction="ifRoom" />
 
 
-    <item
-        android:title="@string/search"
-        android:id="@+id/subCategoryMenuSearch"
-        android:icon="@drawable/ic_search_white_24dp"
-        android:orderInCategory="101"
-        app:showAsAction="ifRoom" />
+<!--    <item-->
+<!--        android:title="@string/search"-->
+<!--        android:id="@+id/subCategoryMenuSearch"-->
+<!--        android:icon="@drawable/ic_search_white_24dp"-->
+<!--        android:orderInCategory="101"-->
+<!--        app:showAsAction="ifRoom" />-->
 
 </menu>

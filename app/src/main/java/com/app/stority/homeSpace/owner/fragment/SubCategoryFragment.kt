@@ -221,7 +221,7 @@ class SubCategoryFragment : Fragment(), Injectable {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        menu.findItem(R.id.subCategoryMenuSearch)?.isVisible = true
+//        menu.findItem(R.id.subCategoryMenuSearch)?.isVisible = true
 
         menu.findItem(R.id.menuList)?.isVisible =
             sharedPref?.getString(
@@ -238,9 +238,9 @@ class SubCategoryFragment : Fragment(), Injectable {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.subCategoryMenuSearch -> {
-                Logger.e(Thread.currentThread(), "search")
-            }
+//            R.id.subCategoryMenuSearch -> {
+//                Logger.e(Thread.currentThread(), "search")
+//            }
 
             R.id.menuGridList -> {
                 changeSubListType(GRID_TYPE)

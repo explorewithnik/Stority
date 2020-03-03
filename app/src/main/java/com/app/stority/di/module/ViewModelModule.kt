@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.app.stority.di.ViewModelKey
 import com.app.stority.di.factory.AppModelFactory
 import com.app.stority.homeSpace.observer.HomeSpaceViewModel
+import com.app.stority.homeSpace.observer.SearchViewModel
 import com.app.stority.homeSpace.observer.SubCategoryViewModel
 import dagger.Binds
 import dagger.Module
@@ -22,6 +23,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(SubCategoryViewModel::class)
     abstract fun bindSubCategoryViewModel(viewModel: SubCategoryViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(SearchViewModel::class)
+    abstract fun bindSearchViewModel(viewModel: SearchViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(factory: AppModelFactory): ViewModelProvider.Factory

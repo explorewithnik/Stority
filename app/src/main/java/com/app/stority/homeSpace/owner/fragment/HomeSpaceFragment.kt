@@ -10,8 +10,10 @@ import android.os.Handler
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+
 import android.widget.Toast
-import androidx.annotation.NonNull
+import androidx.appcompat.widget.SearchView
+
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -20,7 +22,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.app.stority.R
 import com.app.stority.binding.FragmentDataBindingComponent
@@ -40,6 +41,7 @@ import com.app.tooltip.ClosePolicy
 import com.app.tooltip.Tooltip
 import com.app.tooltip.Typefaces
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.fragment_home_space.*
 import javax.inject.Inject
 
 class HomeSpaceFragment : Fragment(), Injectable {
@@ -195,6 +197,58 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.home_space_menu, menu)
+        // Define the listener
+        val expandListener = object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE) {
+                    Handler().postDelayed({
+                        if (isVisible) menu.findItem(R.id.menuList).isVisible = true
+                    }, 1)
+                } else if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == LINEAR_TYPE) {
+                    Handler().postDelayed({
+                        if (isVisible) menu.findItem(R.id.menuGridList).isVisible = true
+                    }, 1)
+                }
+                Handler().postDelayed({
+                    if (isVisible) binding.fab.show()
+                }, 200)
+
+                return true // Return true to collapse action view
+            }
+
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                // Do something when expanded
+                adapter.notifyItemRemoved(0)
+                if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE) {
+                    menu.findItem(R.id.menuList).isVisible = false
+                } else if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == LINEAR_TYPE) {
+                    menu.findItem(R.id.menuGridList).isVisible = false
+                }
+                Handler().postDelayed({
+                    if (isVisible) binding.fab.hide()
+                }, 200)
+
+                return true // Return true to expand action view
+            }
+        }
+
+        // Get the MenuItem for the action item
+        val actionMenuItem = menu.findItem(R.id.menuSearch)
+
+        val searchView = actionMenuItem.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                Logger.e(Thread.currentThread(), "$query")
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                Logger.e(Thread.currentThread(), "$newText")
+                return true
+            }
+        })
+        // Assign the listener to that action item
+        actionMenuItem?.setOnActionExpandListener(expandListener)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -211,14 +265,8 @@ class HomeSpaceFragment : Fragment(), Injectable {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        super.onOptionsItemSelected(item)
         when (item.itemId) {
-
-            R.id.menuSearch -> {
-                Logger.e(Thread.currentThread(), "search")
-                viewModel.deleteAllHomeSpaceData()
-                sharedPref?.edit()?.clear()?.apply()
-                adapter.notifyDataSetChanged()
-            }
 
             R.id.menuGridList -> {
                 changeListType(GRID_TYPE)

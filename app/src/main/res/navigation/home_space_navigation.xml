@@ -13,8 +13,11 @@
 
         <action
             android:id="@id/SubCategoryFragment"
-            app:destination="@id/SubCategoryFragment"
-             />
+            app:destination="@id/SubCategoryFragment" />
+
+        <action
+            android:id="@id/searchFragment"
+            app:destination="@id/searchFragment" />
 
 
     </fragment>
@@ -36,4 +39,11 @@
             app:argType="string" />
 
     </fragment>
+
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.app.stority.homeSpace.owner.fragment.SearchFragment"
+        android:label="SearchFrag"
+        tools:layout="@layout/fragment_search" />
 </navigation>
