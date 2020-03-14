@@ -106,10 +106,10 @@ class SubCategoryFragment : Fragment(), Injectable {
                     binding.fab.hide()
                 }
 
-                ACTION_MORE -> {
-                    binding.fab.hide()
-                    onActionCallback(listData[0], ACTION_MORE_INT)
-                }
+//                ACTION_MORE -> {
+//                    binding.fab.hide()
+//                    onActionCallback(listData[0], ACTION_MORE_INT)
+//                }
 
             }
         }

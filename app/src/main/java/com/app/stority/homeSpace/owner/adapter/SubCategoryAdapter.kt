@@ -1,10 +1,7 @@
 package com.app.stority.homeSpace.owner.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.text.TextUtils
-import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -19,13 +16,12 @@ import com.app.stority.R
 import com.app.stority.databinding.AdapterSubCategoryBinding
 import com.app.stority.helper.AppExecutors
 import com.app.stority.helper.DataBoundListAdapter
+import com.app.stority.homeSpace.data.SubCategoryTable
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ALL
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_DELETE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_HIDE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_SHOW
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ROOT
-import com.app.stority.homeSpace.data.SubCategoryTable
-import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 
 
@@ -140,6 +136,12 @@ class SubCategoryAdapter(
             mode: ActionMode?,
             menu: Menu?
         ): Boolean {
+
+            menu?.findItem(R.id.copy)?.isVisible = false
+            menu?.findItem(R.id.edit)?.isVisible = false
+            menu?.findItem(R.id.menuShare)?.isVisible = false
+            menu?.findItem(R.id.action_more)?.isVisible = false
+
             if (showAddAllMenuIcon) {
                 menu?.findItem(R.id.menuAddAll)?.isVisible = true
                 menu?.findItem(R.id.menuRemoveAll)?.isVisible = false
