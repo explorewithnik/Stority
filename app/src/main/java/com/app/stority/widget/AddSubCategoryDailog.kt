@@ -8,6 +8,8 @@ import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import com.app.stority.R
 import com.app.stority.databinding.DialogAddSubCategoryDataBinding
+import com.app.stority.helper.Logger
+import com.app.stority.helper.afterTextChanged
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_CANCEL
 import com.app.stority.homeSpace.data.SubCategoryTable
 
@@ -43,6 +45,24 @@ class AddSubCategoryDailog(
                 this.dismiss()
                 onCancelCallback.invoke(ACTION_CANCEL)
             }
+
+//            bind.categoryEt.afterTextChanged {
+//                bind.categoryEt.layout?.let {
+//                    if (it.lineCount > 20) {
+//
+//
+//                        Logger.e(
+//                            Thread.currentThread(),
+//                            "line count ${it.lineCount}"
+//                        )
+//                        bind.categoryEt.text.delete(
+//                            bind.categoryEt.text.length - 1,
+//                            bind.categoryEt.text.length
+//                        )
+//                    }
+//                }
+//
+//            }
 
             this.setCanceledOnTouchOutside(false)
         }

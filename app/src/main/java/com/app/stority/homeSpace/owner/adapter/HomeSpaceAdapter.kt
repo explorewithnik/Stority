@@ -20,11 +20,15 @@ import com.app.stority.helper.DataBoundListAdapter
 import com.app.stority.helper.Logger
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ALL
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_COPY
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_DELETE
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_EDIT
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_HIDE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_SHOW
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_MORE
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_RENAME
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ROOT
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_SHARE
 import com.app.tooltip.ClosePolicy
 import com.app.tooltip.Tooltip
 import com.app.tooltip.Typefaces
@@ -54,6 +58,7 @@ class HomeSpaceAdapter(
     var tooltip: Tooltip? = null
     var allListData = ArrayList<HomeSpaceTable?>()
     private var showAddAllMenuIcon = false
+    private var showMoreOption = true
     private var showRemoveAllMenuIcon = false
     var cardViewList = ArrayList<CircularRevealCardView?>()
     private var actionMode: ActionMode? = null
@@ -79,12 +84,12 @@ class HomeSpaceAdapter(
             cardViewList.add(binding.cv)
         }
 
-        binding.more.setOnClickListener {
-            binding.data?.let { data ->
-
-                callback?.invoke(listOf(data), ACTION_MORE)
-            }
-        }
+//        binding.more.setOnClickListener {
+//            binding.data?.let { data ->
+//
+//                callback?.invoke(listOf(data), ACTION_MORE)
+//            }
+//        }
         update(binding.data, binding)
     }
 
@@ -99,6 +104,21 @@ class HomeSpaceAdapter(
                     callback?.invoke(selectedItems, ACTION_DELETE)
                     mode?.finish()
                     callback?.invoke(selectedItems, ACTION_FAB_SHOW)
+                }
+
+                R.id.copy -> {
+                    callback?.invoke(selectedItems, ACTION_COPY)
+                    mode?.finish()
+                }
+
+                R.id.edit -> {
+                    callback?.invoke(selectedItems, ACTION_EDIT)
+                    mode?.finish()
+                }
+
+                R.id.menuShare -> {
+                    callback?.invoke(selectedItems, ACTION_SHARE)
+                    mode?.finish()
                 }
 
                 R.id.menuAddAll -> {
@@ -143,6 +163,20 @@ class HomeSpaceAdapter(
                 menu?.findItem(R.id.menuAddAll)?.isVisible = false
                 menu?.findItem(R.id.menuRemoveAll)?.isVisible = true
             }
+
+            if (showMoreOption) {
+                menu?.findItem(R.id.copy)?.isVisible = true
+                menu?.findItem(R.id.edit)?.isVisible = true
+                menu?.findItem(R.id.menuShare)?.isVisible = true
+                menu?.findItem(R.id.action_more)?.isVisible = true
+            } else {
+                menu?.findItem(R.id.copy)?.isVisible = false
+                menu?.findItem(R.id.edit)?.isVisible = false
+                menu?.findItem(R.id.menuShare)?.isVisible = false
+                menu?.findItem(R.id.action_more)?.isVisible = false
+            }
+
+
             return true
         }
 
@@ -251,6 +285,16 @@ class HomeSpaceAdapter(
                 actionMode?.title = selectedItems.size.toString()
             } else {
                 actionMode?.title = ""
+            }
+
+            Logger.e(Thread.currentThread(), "title ${actionMode?.title}")
+
+            if (actionMode?.title != "1") {
+                showMoreOption = false
+                actionMode?.invalidate()
+            }else{
+                showMoreOption = true
+                actionMode?.invalidate()
             }
 
             if (allListData.size.toString() == actionMode?.title) {

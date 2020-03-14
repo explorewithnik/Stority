@@ -5,19 +5,46 @@
     <item
         android:id="@+id/menuAddAll"
         android:icon="@drawable/ic_tick_all"
-        android:title="@string/select_all"
-        app:showAsAction="ifRoom"/>
+        android:title="@string/remove_all"
+        android:visible="false"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/menuRemoveAll"
         android:icon="@drawable/ic_select_all"
         android:title="@string/select_all"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/menuDelete"
         android:icon="@drawable/ic_delete"
         android:title="@string/delete"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_more"
+        android:icon="@drawable/ic_more_vert_black_24dp"
+        android:title=""
+        app:showAsAction="always">
+
+        <menu>
+            <item
+                android:id="@+id/copy"
+                android:icon="@drawable/ic_content_copy_black_24dp"
+                android:title="@string/copy" />
+
+            <item
+                android:id="@+id/edit"
+                android:icon="@drawable/ic_edit_black"
+                android:title="@string/edit" />
+
+            <item
+                android:id="@+id/menuShare"
+                android:icon="@drawable/ic_share_black"
+                android:title="@string/share" />
+        </menu>
+
+    </item>
+
 
 </menu>

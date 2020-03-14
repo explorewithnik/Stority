@@ -38,7 +38,8 @@
     <string name="try_after_some_time">Sorry for inconvenience, Please try after some time.</string>
     <string name="no_image_found_message">No Image Found, Please click another image.</string>
     <string name="search">Search</string>
-    <string name="menu_list">List</string>
+    <string name="menu_list">Linear List</string>
+    <string name="menu_staggered_list">Staggered List</string>
     <string name="delete">Delete</string>
     <string name="select_all">Select All</string>
     <string name="add_menu_title">Add</string>
@@ -78,4 +79,9 @@
     <string name="add_first_note">Add your first note</string>
     <string name="add_first_note_point">Add points</string>
     <string name="no_note_found">No Note Found </string>
+    <string name="copy">copy</string>
+    <string name="edit">edit</string>
+    <string name="share">share</string>
+    <string name="remove_all">Remove All</string>
+    <string name="more">more</string>
 </resources>

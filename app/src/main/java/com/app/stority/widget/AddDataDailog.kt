@@ -4,10 +4,13 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import com.app.stority.R
 import com.app.stority.databinding.DialogAddDataBinding
+import com.app.stority.helper.Logger
+import com.app.stority.helper.afterTextChanged
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_CANCEL
 
@@ -43,6 +46,23 @@ class AddDataDailog(
             bind.cancelButton.setOnClickListener {
                 this.dismiss()
                 onCancelCallback.invoke(ACTION_CANCEL)
+            }
+
+            bind.categoryEt.afterTextChanged {
+
+                bind.categoryEt.layout?.let {
+                    if (it.lineCount > 1) {
+                        Logger.e(
+                            Thread.currentThread(),
+                            "line count ${it.lineCount}"
+                        )
+                        bind.categoryEt.text.delete(
+                            bind.categoryEt.text.length - 1,
+                            bind.categoryEt.text.length
+                        )
+                    }
+                }
+
             }
 
 

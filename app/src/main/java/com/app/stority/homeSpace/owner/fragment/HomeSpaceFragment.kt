@@ -98,12 +98,43 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     binding.fab.hide()
                 }
 
+                ACTION_COPY -> {
+                    val clipboard =
+                        requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+                    val clip = ClipData.newPlainText("label", listData[0]?.text)
+                    clipboard?.setPrimaryClip(clip)
+                    Logger.e(Thread.currentThread(), "clip $clip")
 
-                ACTION_MORE -> {
-                    Logger.e(Thread.currentThread(), "ACTION_MORE ${Gson().toJson(listData[0])}")
-                    binding.fab.hide()
-                    onActionCallback(listData[0], ACTION_MORE_INT)
+                    Toast.makeText(requireContext(), "copied", Toast.LENGTH_SHORT).show()
                 }
+
+                ACTION_EDIT -> {
+                    AddDataDailog(
+                        context = requireContext(),
+                        data = listData[0],
+                        action = ACTION_RENAME,
+                        dataBindingComponent = dataBindingComponent,
+                        onSaveCallback = this::onSaveCallback,
+                        onCancelCallback = this::onCancelCallback
+                    ).show()
+
+                }
+
+                ACTION_SHARE -> {
+                    Logger.e(Thread.currentThread(), "ACTION_share ${Gson().toJson(listData[0])}")
+                    val sharingIntent = Intent(Intent.ACTION_SEND)
+                    sharingIntent.type = "text/plain"
+                    sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Note")
+                    sharingIntent.putExtra(Intent.EXTRA_TEXT, listData[0]?.text)
+                    startActivity(Intent.createChooser(sharingIntent, "Share via"))
+                }
+
+
+//                ACTION_MORE -> {
+//                    Logger.e(Thread.currentThread(), "ACTION_MORE ${Gson().toJson(listData[0])}")
+//                    binding.fab.hide()
+//                    onActionCallback(listData[0], ACTION_MORE_INT)
+//                }
 
             }
         }

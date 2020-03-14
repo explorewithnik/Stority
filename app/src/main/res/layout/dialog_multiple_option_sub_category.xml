@@ -44,7 +44,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/share"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_edit_black_24dp" />
+            app:srcCompat="@drawable/ic_edit_brown_24dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

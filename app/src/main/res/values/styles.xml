@@ -27,6 +27,8 @@
         <item name="android:navigationBarColor" tools:targetApi="lollipop">
             @color/app_theme_color
         </item>
+
+
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
         <item name="android:windowBackground">@color/app_theme_color</item>
         <item name="android:textColor">?attr/colorOnBackground</item>

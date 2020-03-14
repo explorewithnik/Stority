@@ -33,8 +33,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tool:context=".homeSpace.owner.activity.HomeSpaceActivity"
-     >
+        tool:context=".homeSpace.owner.activity.HomeSpaceActivity">
 
         <include
             android:id="@+id/progress"

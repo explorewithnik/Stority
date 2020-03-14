@@ -1,7 +1,10 @@
 package com.app.stority.homeSpace.owner.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.text.TextUtils
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -79,11 +82,11 @@ class SubCategoryAdapter(
             cardViewList.add(binding.cv)
         }
 
-        binding.more?.setOnClickListener {
-            binding.data?.let { data ->
-                callback?.invoke(listOf(data), HomeSpaceFragment.ACTION_MORE)
-            }
-        }
+//        binding.more.setOnClickListener {
+//            binding.data?.let { data ->
+//                callback?.invoke(listOf(data), HomeSpaceFragment.ACTION_MORE)
+//            }
+//        }
 
         update(binding.data, binding)
     }
