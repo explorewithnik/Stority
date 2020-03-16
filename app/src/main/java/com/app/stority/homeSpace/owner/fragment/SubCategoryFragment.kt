@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.app.stority.R
@@ -82,6 +83,7 @@ class SubCategoryFragment : Fragment(), Injectable {
         viewModel.init(entryId)
 
         adapter = SubCategoryAdapter(
+            isFirstRun = isFirstRun,
             context = requireContext(),
             dataBindingComponent = dataBindingComponent,
             appExecutors = executors
@@ -90,7 +92,15 @@ class SubCategoryFragment : Fragment(), Injectable {
             when (action) {
 
                 ACTION_ROOT -> {
-                    Logger.e(Thread.currentThread(), "item ${Gson().toJson(listData)}")
+                    listData[0]?.let {
+                        val actionSub = SubCategoryFragmentDirections.subCategoryViewFragment()
+                        actionSub.text = it.text ?: ""
+                        actionSub.entryId = it.subCategoryId.toString()
+                        actionSub.timeStamp = it.timeStamp ?: ""
+                        findNavController().navigate(actionSub)
+                        Logger.e(Thread.currentThread(), "item ${Gson().toJson(listData)}")
+                    }
+
                 }
 
                 ACTION_DELETE -> {
@@ -106,10 +116,24 @@ class SubCategoryFragment : Fragment(), Injectable {
                     binding.fab.hide()
                 }
 
-//                ACTION_MORE -> {
-//                    binding.fab.hide()
-//                    onActionCallback(listData[0], ACTION_MORE_INT)
-//                }
+                ACTION_COPY -> {
+                    val clipboard =
+                        requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+                    val clip = ClipData.newPlainText("label", listData[0]?.text)
+                    clipboard?.setPrimaryClip(clip)
+                    Logger.e(Thread.currentThread(), "clip $clip")
+
+                    Toast.makeText(requireContext(), "copied", Toast.LENGTH_SHORT).show()
+                }
+
+                ACTION_SHARE -> {
+                    Logger.e(Thread.currentThread(), "ACTION_share ${Gson().toJson(listData[0])}")
+                    val sharingIntent = Intent(Intent.ACTION_SEND)
+                    sharingIntent.type = "text/plain"
+                    sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Note")
+                    sharingIntent.putExtra(Intent.EXTRA_TEXT, listData[0]?.text)
+                    startActivity(Intent.createChooser(sharingIntent, "Share via"))
+                }
 
             }
         }
@@ -221,7 +245,7 @@ class SubCategoryFragment : Fragment(), Injectable {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-//        menu.findItem(R.id.subCategoryMenuSearch)?.isVisible = true
+        menu.findItem(R.id.menuSearch)?.isVisible = true
 
         menu.findItem(R.id.menuList)?.isVisible =
             sharedPref?.getString(
@@ -438,10 +462,8 @@ class SubCategoryFragment : Fragment(), Injectable {
                     }
 
                     ?.show(binding.fab, Tooltip.Gravity.LEFT, true)
-
             }
         }
-
 
     }
 

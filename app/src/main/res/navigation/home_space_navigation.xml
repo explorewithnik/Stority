@@ -38,6 +38,10 @@
             android:defaultValue="null"
             app:argType="string" />
 
+        <action
+            android:id="@id/subCategoryViewFragment"
+            app:destination="@id/subCategoryViewFragment" />
+
     </fragment>
 
 
@@ -46,4 +50,27 @@
         android:name="com.app.stority.homeSpace.owner.fragment.SearchFragment"
         android:label="SearchFrag"
         tools:layout="@layout/fragment_search" />
+
+    <fragment
+        android:id="@+id/subCategoryViewFragment"
+        android:name="com.app.stority.homeSpace.owner.fragment.SubCategoryViewFragment"
+        android:label="subCategoryViewFragment"
+        tools:layout="@layout/fragment_sub_category_view">
+
+        <argument
+            android:name="text"
+            android:defaultValue="null"
+            app:argType="string" />
+
+        <argument
+            android:name="entryId"
+            android:defaultValue="-1"
+            app:argType="string" />
+
+        <argument
+            android:name="timeStamp"
+            android:defaultValue="-1"
+            app:argType="string" />
+
+    </fragment>
 </navigation>

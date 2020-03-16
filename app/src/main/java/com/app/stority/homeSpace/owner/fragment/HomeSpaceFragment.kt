@@ -10,10 +10,8 @@ import android.os.Handler
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -41,7 +39,6 @@ import com.app.tooltip.ClosePolicy
 import com.app.tooltip.Tooltip
 import com.app.tooltip.Typefaces
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.fragment_home_space.*
 import javax.inject.Inject
 
 class HomeSpaceFragment : Fragment(), Injectable {
@@ -90,6 +87,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     requireActivity().invalidateOptionsMenu()
                 }
 
+
                 ACTION_FAB_SHOW -> {
                     binding.fab.show()
                 }
@@ -129,13 +127,9 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     startActivity(Intent.createChooser(sharingIntent, "Share via"))
                 }
 
-
-//                ACTION_MORE -> {
-//                    Logger.e(Thread.currentThread(), "ACTION_MORE ${Gson().toJson(listData[0])}")
-//                    binding.fab.hide()
-//                    onActionCallback(listData[0], ACTION_MORE_INT)
-//                }
-
+                else -> {
+                    Logger.e(Thread.currentThread(), "else called")
+                }
             }
         }
 
@@ -210,9 +204,6 @@ class HomeSpaceFragment : Fragment(), Injectable {
             binding.fab.hide()
             onActionCallback(HomeSpaceTable(), ACTION_NEW)
         }
-
-
-
         return binding.root
     }
 
@@ -498,7 +489,5 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
             }
         }
-
-
     }
 }

@@ -4,6 +4,7 @@ import com.app.stority.displayImage.DisplayFragment
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment
 import com.app.stority.homeSpace.owner.fragment.SearchFragment
 import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment
+import com.app.stority.homeSpace.owner.fragment.SubCategoryViewFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -21,5 +22,8 @@ abstract class FragmentModule {
 
     @ContributesAndroidInjector
     abstract fun contributeSearchFragment(): SearchFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeSubCategoryViewFragment(): SubCategoryViewFragment
 
 }

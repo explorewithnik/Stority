@@ -19,16 +19,17 @@ import com.app.stority.helper.AppExecutors
 import com.app.stority.helper.DataBoundListAdapter
 import com.app.stority.helper.Logger
 import com.app.stority.homeSpace.data.HomeSpaceTable
+import com.app.stority.homeSpace.data.SubCategoryTable
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ALL
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_COPY
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_DELETE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_EDIT
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_HIDE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_SHOW
-import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_MORE
-import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_RENAME
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ROOT
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_SHARE
+import com.app.stority.widget.ConfirmationDailog
+import com.app.stority.widget.ConfirmationDailog.Companion.HOME_SPACE_DATA
 import com.app.tooltip.ClosePolicy
 import com.app.tooltip.Tooltip
 import com.app.tooltip.Typefaces
@@ -84,12 +85,6 @@ class HomeSpaceAdapter(
             cardViewList.add(binding.cv)
         }
 
-//        binding.more.setOnClickListener {
-//            binding.data?.let { data ->
-//
-//                callback?.invoke(listOf(data), ACTION_MORE)
-//            }
-//        }
         update(binding.data, binding)
     }
 
@@ -101,9 +96,19 @@ class HomeSpaceAdapter(
         ): Boolean {
             when (item?.itemId) {
                 R.id.menuDelete -> {
-                    callback?.invoke(selectedItems, ACTION_DELETE)
-                    mode?.finish()
-                    callback?.invoke(selectedItems, ACTION_FAB_SHOW)
+                    ConfirmationDailog(
+                        context = context,
+                        data = null,
+                        title = "Selected notes will be deleted",
+                        homeSpaceData = selectedItems,
+                        action = ACTION_DELETE,
+                        typeOfDataToDelete = HOME_SPACE_DATA,
+                        dataBindingComponent = dataBindingComponent,
+                        onDeleteCallback = this@HomeSpaceAdapter::onDeleteCallback,
+                        onHomeSpaceDeleteCallback = this@HomeSpaceAdapter::onHomeSpaceDeleteCallback,
+                        onCancelCallback = this@HomeSpaceAdapter::onCancelCallback,
+                        onSubCategoryListDeleteCallback = this@HomeSpaceAdapter::onSubCategoryListDeleteCallback
+                    ).show()
                 }
 
                 R.id.copy -> {
@@ -190,6 +195,11 @@ class HomeSpaceAdapter(
             cardViewList.clear()
             notifyDataSetChanged()
         }
+    }
+
+
+    private fun onDeleteCallback(data: SubCategoryTable?, action: String) {
+
     }
 
     private fun update(data: HomeSpaceTable?, binding: AdapterHomeSpaceBinding?) {
@@ -292,7 +302,7 @@ class HomeSpaceAdapter(
             if (actionMode?.title != "1") {
                 showMoreOption = false
                 actionMode?.invalidate()
-            }else{
+            } else {
                 showMoreOption = true
                 actionMode?.invalidate()
             }
@@ -315,6 +325,22 @@ class HomeSpaceAdapter(
                 }
             }
         }
+    }
+
+    private fun onHomeSpaceDeleteCallback(list: List<HomeSpaceTable?>, action: String) {
+        callback?.invoke(selectedItems, ACTION_DELETE)
+        actionMode?.finish()
+        callback?.invoke(selectedItems, ACTION_FAB_SHOW)
+    }
+
+    private fun onCancelCallback(action: String) {
+        callback?.invoke(listOf(HomeSpaceTable()), ACTION_FAB_SHOW)
+        actionMode?.finish()
+    }
+
+
+    private fun onSubCategoryListDeleteCallback(list: List<SubCategoryTable?>, action: String) {
+
     }
 
 }

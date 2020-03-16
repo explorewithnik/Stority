@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.ViewGroup
+import android.view.animation.Animation
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
@@ -16,16 +17,27 @@ import com.app.stority.R
 import com.app.stority.databinding.AdapterSubCategoryBinding
 import com.app.stority.helper.AppExecutors
 import com.app.stority.helper.DataBoundListAdapter
+import com.app.stority.helper.Logger
+import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.data.SubCategoryTable
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ALL
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_DELETE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_HIDE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_SHOW
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ROOT
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_COPY
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_EDIT
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_SHARE
+import com.app.stority.widget.ConfirmationDailog
+import com.app.stority.widget.ConfirmationDailog.Companion.SUB_CATEGORY_LIST_DATA
+import com.app.tooltip.ClosePolicy
+import com.app.tooltip.Tooltip
+import com.app.tooltip.Typefaces
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 
 
 class SubCategoryAdapter(
+    private var isFirstRun: Boolean?,
     private val context: Context,
     private val dataBindingComponent: DataBindingComponent,
     val appExecutors: AppExecutors,
@@ -50,13 +62,14 @@ class SubCategoryAdapter(
         }
     }
 ) {
-
+    private var tooltip: Tooltip? = null
     var allListData = ArrayList<SubCategoryTable?>()
     private var showAddAllMenuIcon = false
     private var showRemoveAllMenuIcon = false
     var cardViewList = ArrayList<CircularRevealCardView?>()
     private var actionMode: ActionMode? = null
     private var multiSelect = false
+    private var showMoreOption = true
     private val selectedItems = ArrayList<SubCategoryTable?>()
     override fun createBinding(parent: ViewGroup): AdapterSubCategoryBinding {
 
@@ -78,12 +91,6 @@ class SubCategoryAdapter(
             cardViewList.add(binding.cv)
         }
 
-//        binding.more.setOnClickListener {
-//            binding.data?.let { data ->
-//                callback?.invoke(listOf(data), HomeSpaceFragment.ACTION_MORE)
-//            }
-//        }
-
         update(binding.data, binding)
     }
 
@@ -95,12 +102,37 @@ class SubCategoryAdapter(
         ): Boolean {
             when (item?.itemId) {
                 R.id.menuDelete -> {
-                    callback?.invoke(selectedItems, ACTION_DELETE)
-                    mode?.finish()
-                    callback?.invoke(selectedItems, ACTION_FAB_SHOW)
+                    ConfirmationDailog(
+                        context = context,
+                        data = null,
+                        title = "Selected notes will be deleted",
+                        homeSpaceData = listOf(),
+                        action = ACTION_DELETE,
+                        typeOfDataToDelete = SUB_CATEGORY_LIST_DATA,
+                        dataBindingComponent = dataBindingComponent,
+                        onDeleteCallback = this@SubCategoryAdapter::onDeleteCallback,
+                        onHomeSpaceDeleteCallback = this@SubCategoryAdapter::onHomeSpaceDeleteCallback,
+                        onSubCategoryListDeleteCallback = this@SubCategoryAdapter::onSubCategoryListDeleteCallback,
+                        onCancelCallback = this@SubCategoryAdapter::onCancelCallback
+                    ).show()
                 }
 
                 R.id.menuAddAll -> {
+                    mode?.finish()
+                }
+
+                R.id.copy -> {
+                    callback?.invoke(selectedItems, ACTION_COPY)
+                    mode?.finish()
+                }
+
+//                R.id.edit -> {
+//                    callback?.invoke(selectedItems, ACTION_EDIT)
+//                    mode?.finish()
+//                }
+
+                R.id.menuShare -> {
+                    callback?.invoke(selectedItems, ACTION_SHARE)
                     mode?.finish()
                 }
 
@@ -136,12 +168,7 @@ class SubCategoryAdapter(
             mode: ActionMode?,
             menu: Menu?
         ): Boolean {
-
-            menu?.findItem(R.id.copy)?.isVisible = false
             menu?.findItem(R.id.edit)?.isVisible = false
-            menu?.findItem(R.id.menuShare)?.isVisible = false
-            menu?.findItem(R.id.action_more)?.isVisible = false
-
             if (showAddAllMenuIcon) {
                 menu?.findItem(R.id.menuAddAll)?.isVisible = true
                 menu?.findItem(R.id.menuRemoveAll)?.isVisible = false
@@ -149,6 +176,19 @@ class SubCategoryAdapter(
                 menu?.findItem(R.id.menuAddAll)?.isVisible = false
                 menu?.findItem(R.id.menuRemoveAll)?.isVisible = true
             }
+
+            if (showMoreOption) {
+                menu?.findItem(R.id.copy)?.isVisible = true
+//                menu?.findItem(R.id.edit)?.isVisible = true
+                menu?.findItem(R.id.menuShare)?.isVisible = true
+                menu?.findItem(R.id.action_more)?.isVisible = true
+            } else {
+                menu?.findItem(R.id.copy)?.isVisible = false
+//                menu?.findItem(R.id.edit)?.isVisible = false
+                menu?.findItem(R.id.menuShare)?.isVisible = false
+                menu?.findItem(R.id.action_more)?.isVisible = false
+            }
+
             return true
         }
 
@@ -179,6 +219,39 @@ class SubCategoryAdapter(
             binding?.cv?.strokeColor = Color.TRANSPARENT
             binding?.cv?.strokeWidth = 0
             binding?.cv?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+        }
+
+        Logger.e(Thread.currentThread(), "isFirstRun $isFirstRun")
+
+        if (cardViewList.isNotEmpty() && cardViewList.size == 1 && isFirstRun == true) {
+            binding?.cv?.post {
+                val metrics = context.resources.displayMetrics
+
+                tooltip = Tooltip.Builder(context)
+                    .anchor(binding.cv, 0, 0, true)
+                    .text("tap on card to copy, edit or delete note")
+                    .styleId(R.style.ToolTipAltStyle)
+                    .typeface(Typefaces[context, "font/roboto.ttf"])
+                    .maxWidth(metrics.widthPixels / 2)
+                    .arrow(true)
+                    .floatingAnimation(Tooltip.Animation.DEFAULT)
+                    .closePolicy(ClosePolicy.TOUCH_ANYWHERE_NO_CONSUME)
+                    .showDuration(Animation.INFINITE.toLong())
+                    .overlay(true)
+                    .create()
+
+                tooltip?.doOnHidden {
+                    tooltip = null
+                }
+                    ?.doOnFailure {
+
+                    }
+                    ?.doOnShown {
+
+                    }
+
+                    ?.show(binding.cv, Tooltip.Gravity.RIGHT, true)
+            }
         }
 
         binding?.root?.setOnClickListener {
@@ -226,6 +299,16 @@ class SubCategoryAdapter(
                 actionMode?.title = ""
             }
 
+            Logger.e(Thread.currentThread(), "title ${actionMode?.title}")
+
+            if (actionMode?.title != "1") {
+                showMoreOption = false
+                actionMode?.invalidate()
+            } else {
+                showMoreOption = true
+                actionMode?.invalidate()
+            }
+
             if (allListData.size.toString() == actionMode?.title) {
                 showAddAllMenuIcon = true
                 showRemoveAllMenuIcon = false
@@ -246,4 +329,22 @@ class SubCategoryAdapter(
         }
     }
 
+    private fun onCancelCallback(action: String) {
+        callback?.invoke(listOf(SubCategoryTable()), ACTION_FAB_SHOW)
+        actionMode?.finish()
+    }
+
+    private fun onSubCategoryListDeleteCallback(list: List<SubCategoryTable?>, action: String) {
+        callback?.invoke(selectedItems, ACTION_DELETE)
+        actionMode?.finish()
+        callback?.invoke(selectedItems, ACTION_FAB_SHOW)
+    }
+
+    private fun onDeleteCallback(data: SubCategoryTable?, action: String) {
+
+    }
+
+    private fun onHomeSpaceDeleteCallback(list: List<HomeSpaceTable?>, action: String) {
+
+    }
 }
