@@ -5,8 +5,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.app.stority.R
+import com.app.stority.homeSpace.owner.fragment.SubCategoryViewFragment
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
+import kotlinx.android.synthetic.main.activity_home_space.*
 import javax.inject.Inject
 
 class HomeSpaceActivity : AppCompatActivity(), HasSupportFragmentInjector {
@@ -44,5 +46,14 @@ class HomeSpaceActivity : AppCompatActivity(), HasSupportFragmentInjector {
         const val FIRST_TIME_LAUNCH_2 = "firstTimeLaunch2"
         const val PRIVATE_MODE = 0
         const val PREF_NAME = "HomeSpacePref"
+    }
+
+    override fun onBackPressed() {
+        val fragment = container.childFragmentManager.fragments[0]
+        if (fragment != null && fragment is SubCategoryViewFragment) {
+            fragment.onBackPress()
+        } else {
+            super.onBackPressed()
+        }
     }
 }

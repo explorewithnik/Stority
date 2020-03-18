@@ -37,6 +37,7 @@ import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.LINE
 import com.app.stority.remoteUtils.Status
 import com.app.stority.widget.AddSubCategoryDailog
 import com.app.stority.widget.MultipleOptionDailogSubCategory
+import com.app.stority.widget.OnBackPressed
 import com.app.tooltip.ClosePolicy
 import com.app.tooltip.Tooltip
 import com.app.tooltip.Typefaces
@@ -44,13 +45,15 @@ import com.google.gson.Gson
 import javax.inject.Inject
 
 
-class SubCategoryFragment : Fragment(), Injectable {
+class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
     private var tooltip: Tooltip? = null
     var binding by autoCleared<FragmentSubCategoryBinding>()
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
     private var adapter by autoCleared<SubCategoryAdapter>()
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
     @Inject
     lateinit var executors: AppExecutors
     private lateinit var viewModel: SubCategoryViewModel
@@ -66,6 +69,8 @@ class SubCategoryFragment : Fragment(), Injectable {
 
         entryId = savedInstanceState?.getString(entryId)
             ?: SubCategoryFragmentArgs.fromBundle(arguments!!).entryId
+
+        Logger.e(Thread.currentThread(), "entryId $entryId")
 
         text = savedInstanceState?.getString(text)
             ?: SubCategoryFragmentArgs.fromBundle(arguments!!).text
@@ -97,6 +102,7 @@ class SubCategoryFragment : Fragment(), Injectable {
                         actionSub.text = it.text ?: ""
                         actionSub.entryId = it.subCategoryId.toString()
                         actionSub.timeStamp = it.timeStamp ?: ""
+                        actionSub.parentId = entryId
                         findNavController().navigate(actionSub)
                         Logger.e(Thread.currentThread(), "item ${Gson().toJson(listData)}")
                     }
@@ -158,6 +164,10 @@ class SubCategoryFragment : Fragment(), Injectable {
                     endProgress()
                     if (listResource.data != null) {
                         adapter.submitList(listResource.data)
+//                        adapter.submitList(
+//                            listResource.data.filter {
+//                                it.text?.isNotEmpty()!! ||it.text?.isNotBlank()!!
+//                            })
                         binding.recycler.smoothScrollToPosition(0)
                         adapter.allListData.clear()
                         adapter.allListData.addAll(listResource.data)
@@ -452,8 +462,8 @@ class SubCategoryFragment : Fragment(), Injectable {
                     .create()
 
                 tooltip?.doOnHidden {
-                    tooltip = null
-                }
+                        tooltip = null
+                    }
                     ?.doOnFailure {
 
                     }
@@ -472,6 +482,10 @@ class SubCategoryFragment : Fragment(), Injectable {
             if (isVisible)
                 binding.recycler.smoothScrollToPosition(0)
         }, 200)
+    }
+
+    override fun onBackPress() {
+        TODO("Not yet implemented")
     }
 
 }

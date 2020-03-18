@@ -3,9 +3,12 @@ package com.app.stority.homeSpace.owner.fragment
 import android.content.*
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -16,26 +19,29 @@ import com.app.stority.R
 import com.app.stority.binding.FragmentDataBindingComponent
 import com.app.stority.databinding.FragmentSubCategoryViewBinding
 import com.app.stority.di.Injectable
-import com.app.stority.helper.AppExecutors
-import com.app.stority.helper.Logger
-import com.app.stority.helper.autoCleared
+import com.app.stority.helper.*
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.data.SubCategoryTable
 import com.app.stority.homeSpace.observer.SubCategoryViewModel
 import com.app.stority.homeSpace.owner.activity.HomeSpaceActivity
 import com.app.stority.widget.ConfirmationDailog
 import com.app.stority.widget.ConfirmationDailog.Companion.SUB_CATEGORY_DATA
+import com.app.stority.widget.OnBackPressed
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-class SubCategoryViewFragment : Fragment(), Injectable {
+class SubCategoryViewFragment : Fragment(), Injectable, OnBackPressed {
     var binding by autoCleared<FragmentSubCategoryViewBinding>()
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
 
     private lateinit var viewModel: SubCategoryViewModel
+
+    private var editedText = ""
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
     @Inject
     lateinit var executors: AppExecutors
     private var isFirstRun = false
@@ -43,7 +49,7 @@ class SubCategoryViewFragment : Fragment(), Injectable {
     private var text = ""
     private var entryId = "-1"
     private var title = ""
-
+    private var parentId = "-1"
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -63,6 +69,11 @@ class SubCategoryViewFragment : Fragment(), Injectable {
 
         entryId = savedInstanceState?.getString(entryId)
             ?: SubCategoryViewFragmentArgs.fromBundle(arguments!!).entryId
+
+        parentId = savedInstanceState?.getString(parentId)
+            ?: SubCategoryViewFragmentArgs.fromBundle(arguments!!).parentId
+
+        Logger.e(Thread.currentThread(), "parentId $parentId")
 
         title = savedInstanceState?.getString(title)
             ?: SubCategoryViewFragmentArgs.fromBundle(arguments!!).timeStamp
@@ -90,6 +101,10 @@ class SubCategoryViewFragment : Fragment(), Injectable {
             it.isFirstRun = isFirstRun
             it.text = text
         }
+
+        binding.editView.afterTextChanged {
+            editedText = it
+        }
     }
 
     override fun onCreateView(
@@ -105,6 +120,7 @@ class SubCategoryViewFragment : Fragment(), Injectable {
             false,
             dataBindingComponent
         )
+
 
         return binding.root
     }
@@ -211,6 +227,29 @@ class SubCategoryViewFragment : Fragment(), Injectable {
             //if (AppConfig.DEBUG_MODE) e.printStackTrace()
         }
 
+    }
+
+    override fun onBackPress() {
+        if (editedText.trim() == text) {
+            Logger.e(Thread.currentThread(), "text not edited  $editedText")
+            findNavController().popBackStack()
+        } else {
+            if (!editedText.trim().isNullOrBlankOrEmpty()) {
+                Logger.e(Thread.currentThread(), "text edited  $editedText")
+                val subCategoryTable = SubCategoryTable()
+                subCategoryTable.text = editedText.trim()
+                subCategoryTable.subCategoryId = entryId.toInt()
+                subCategoryTable.timeStamp = System.currentTimeMillis().toString()
+                subCategoryTable.id = parentId.toInt()
+                viewModel.updateSubCategory(subCategoryTable)
+                findNavController().popBackStack()
+            } else {
+                val subCategoryTable = SubCategoryTable()
+                subCategoryTable.subCategoryId = entryId.toInt()
+                viewModel.deleteSubCategoryData(subCategoryTable)
+                findNavController().popBackStack()
+            }
+        }
     }
 
 }
