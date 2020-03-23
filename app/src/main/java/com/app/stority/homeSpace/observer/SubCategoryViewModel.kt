@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import com.app.stority.helper.Logger
 import com.app.stority.remoteUtils.AbsentLiveData
 import com.app.stority.remoteUtils.Resource
 import com.app.stority.homeSpace.data.SubCategoryTable
@@ -48,8 +49,15 @@ class SubCategoryViewModel @Inject constructor(
         }
     }
 
-    fun init(entryId: String) {
-        apiCall.value = entryId
+    fun init(entryId: String): Boolean {
+        Logger.e(Thread.currentThread(), "value")
+        return if (apiCall.value == entryId) {
+            true
+        } else {
+            Logger.e(Thread.currentThread(), "init")
+            apiCall.value = entryId
+            false
+        }
     }
 
     fun deleteSubCategoryData(data: SubCategoryTable?) {
@@ -63,7 +71,7 @@ class SubCategoryViewModel @Inject constructor(
 
     fun insertSubCategory(entryId: String, data: SubCategoryTable?) {
 
-        repo.insertSubCategoryData(entryId,data)
+        repo.insertSubCategoryData(entryId, data)
 
     }
 

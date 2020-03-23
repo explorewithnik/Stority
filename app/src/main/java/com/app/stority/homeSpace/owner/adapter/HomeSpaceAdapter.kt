@@ -265,8 +265,6 @@ class HomeSpaceAdapter(
             }
             return@setOnLongClickListener true
         }
-
-
     }
 
     fun selectItem(data: HomeSpaceTable?, cv: CircularRevealCardView?, action: String?) {

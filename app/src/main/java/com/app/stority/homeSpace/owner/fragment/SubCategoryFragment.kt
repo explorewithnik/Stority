@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -36,6 +37,7 @@ import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.GRID
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.LINEAR_TYPE
 import com.app.stority.remoteUtils.Status
 import com.app.stority.widget.AddSubCategoryDailog
+import com.app.stority.widget.CommonMethods
 import com.app.stority.widget.MultipleOptionDailogSubCategory
 import com.app.stority.widget.OnBackPressed
 import com.app.tooltip.ClosePolicy
@@ -56,7 +58,7 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
 
     @Inject
     lateinit var executors: AppExecutors
-    private lateinit var viewModel: SubCategoryViewModel
+    private val viewModel: SubCategoryViewModel by viewModels { viewModelFactory }
     private var isFirstRun: Boolean? = null
     private var sharedPref: SharedPreferences? = null
 
@@ -77,15 +79,19 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
 
         Logger.e(Thread.currentThread(), "text $text")
 
-        requireActivity().title = text
+        requireActivity().title = ""
+        CommonMethods.setUpToolbar(
+            requireActivity(),
+            text,
+            "SubCategoryFragment"
+        )
 
         changeSubListType(sharedPref?.getString(entryId, GRID_TYPE))
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(SubCategoryViewModel::class.java)
 
-
-        viewModel.init(entryId)
+        val stopAnim = viewModel.init(entryId)
+        if (stopAnim) isFirstRun =
+            false //stopping tooltip anim when coming back from sub category frag
 
         adapter = SubCategoryAdapter(
             isFirstRun = isFirstRun,

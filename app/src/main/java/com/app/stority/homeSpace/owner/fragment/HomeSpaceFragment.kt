@@ -15,6 +15,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -34,6 +35,7 @@ import com.app.stority.homeSpace.owner.activity.HomeSpaceActivity
 import com.app.stority.homeSpace.owner.adapter.HomeSpaceAdapter
 import com.app.stority.remoteUtils.Status
 import com.app.stority.widget.AddDataDailog
+import com.app.stority.widget.CommonMethods
 import com.app.stority.widget.MultipleOptionDailog
 import com.app.tooltip.ClosePolicy
 import com.app.tooltip.Tooltip
@@ -46,22 +48,25 @@ class HomeSpaceFragment : Fragment(), Injectable {
     var binding by autoCleared<FragmentHomeSpaceBinding>()
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
     private var adapter by autoCleared<HomeSpaceAdapter>()
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
     @Inject
     lateinit var executors: AppExecutors
-    private lateinit var viewModel: HomeSpaceViewModel
+    private val viewModel: HomeSpaceViewModel by viewModels { viewModelFactory }
     private var isFirstRun: Boolean = false
     private var sharedPref: SharedPreferences? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        requireActivity().title = getString(R.string.app_name)
+        CommonMethods.setUpToolbar(
+            requireActivity(),
+            "My Notes",
+            "HomeSpaceFragment"
+        )
         Logger.e(Thread.currentThread(), "onActivityCreated")
         changeListType(sharedPref?.getString(LIST_TYPE, GRID_TYPE))
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(HomeSpaceViewModel::class.java)
 
         val stopAnim = viewModel.init(value = "1")
         if (stopAnim) isFirstRun =
@@ -219,9 +224,11 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.home_space_menu, menu)
+
         // Define the listener
         val expandListener = object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                adapter.submitList(adapter.allListData)
                 if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE) {
                     Handler().postDelayed({
                         if (isVisible) menu.findItem(R.id.menuList).isVisible = true
@@ -240,7 +247,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
             override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                 // Do something when expanded
-                adapter.notifyItemRemoved(0)
+                adapter.submitList(emptyList())
                 if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE) {
                     menu.findItem(R.id.menuList).isVisible = false
                 } else if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == LINEAR_TYPE) {
@@ -260,12 +267,12 @@ class HomeSpaceFragment : Fragment(), Injectable {
         val searchView = actionMenuItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Logger.e(Thread.currentThread(), "$query")
+                Logger.e(Thread.currentThread(), "onQueryTextSubmit $query")
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                Logger.e(Thread.currentThread(), "$newText")
+                Logger.e(Thread.currentThread(), "onQueryTextChange $newText")
                 return true
             }
         })
@@ -476,8 +483,8 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     .create()
 
                 tooltip?.doOnHidden {
-                    tooltip = null
-                }
+                        tooltip = null
+                    }
                     ?.doOnFailure {
 
                     }

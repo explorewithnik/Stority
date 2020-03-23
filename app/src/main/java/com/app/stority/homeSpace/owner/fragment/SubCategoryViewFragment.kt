@@ -1,19 +1,16 @@
 package com.app.stority.homeSpace.owner.fragment
 
 import android.content.*
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import android.widget.TextView
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
-import androidx.core.widget.addTextChangedListener
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.app.stority.R
 import com.app.stority.binding.FragmentDataBindingComponent
@@ -24,18 +21,17 @@ import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.data.SubCategoryTable
 import com.app.stority.homeSpace.observer.SubCategoryViewModel
 import com.app.stority.homeSpace.owner.activity.HomeSpaceActivity
+import com.app.stority.widget.CommonMethods
 import com.app.stority.widget.ConfirmationDailog
 import com.app.stority.widget.ConfirmationDailog.Companion.SUB_CATEGORY_DATA
 import com.app.stority.widget.OnBackPressed
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 
 class SubCategoryViewFragment : Fragment(), Injectable, OnBackPressed {
     var binding by autoCleared<FragmentSubCategoryViewBinding>()
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
 
-    private lateinit var viewModel: SubCategoryViewModel
+    private val viewModel: SubCategoryViewModel by viewModels { viewModelFactory }
 
     private var editedText = ""
 
@@ -61,7 +57,12 @@ class SubCategoryViewFragment : Fragment(), Injectable, OnBackPressed {
         super.onActivityCreated(savedInstanceState)
 
         requireActivity().title = ""
-        Logger.e(Thread.currentThread(), "onActivityCreated")
+
+        title = savedInstanceState?.getString(title)
+            ?: SubCategoryViewFragmentArgs.fromBundle(arguments!!).timeStamp
+
+        CommonMethods.setUpToolbar(requireActivity(), title, "SubCategoryViewFragment")
+//        Logger.e(Thread.currentThread(), "onActivityCreated")
 
         text = savedInstanceState?.getString(text)
             ?: SubCategoryViewFragmentArgs.fromBundle(arguments!!).text
@@ -73,28 +74,13 @@ class SubCategoryViewFragment : Fragment(), Injectable, OnBackPressed {
         parentId = savedInstanceState?.getString(parentId)
             ?: SubCategoryViewFragmentArgs.fromBundle(arguments!!).parentId
 
-        Logger.e(Thread.currentThread(), "parentId $parentId")
+//        Logger.e(Thread.currentThread(), "parentId $parentId")
 
-        title = savedInstanceState?.getString(title)
-            ?: SubCategoryViewFragmentArgs.fromBundle(arguments!!).timeStamp
-
-        title.let { timeStamp ->
-            if (timeStamp.isNotBlank() && timeStamp.isNotEmpty()) {
-                requireActivity().title = bindDateTime(
-                    Date(timeStamp.toLong()),
-                    "MMM dd, hh:mm aa",
-                    ""
-                )
-            }
-        }
 
         isFirstRun = (activity as HomeSpaceActivity).isFirstRun ?: false
-        Logger.e(Thread.currentThread(), "firstTimeLaunch SubCategoryViewFragment $isFirstRun")
-        Logger.e(Thread.currentThread(), "text SubCategoryViewFragment $text")
-        Logger.e(Thread.currentThread(), "entryId SubCategoryViewFragment $entryId")
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(SubCategoryViewModel::class.java)
+//        Logger.e(Thread.currentThread(), "firstTimeLaunch SubCategoryViewFragment $isFirstRun")
+//        Logger.e(Thread.currentThread(), "text SubCategoryViewFragment $text")
+//        Logger.e(Thread.currentThread(), "entryId SubCategoryViewFragment $entryId")
 
         binding.let {
             it.lifecycleOwner = this
@@ -121,7 +107,6 @@ class SubCategoryViewFragment : Fragment(), Injectable, OnBackPressed {
             dataBindingComponent
         )
 
-
         return binding.root
     }
 
@@ -145,12 +130,16 @@ class SubCategoryViewFragment : Fragment(), Injectable, OnBackPressed {
         super.onOptionsItemSelected(item)
         when (item.itemId) {
 
+            android.R.id.home -> {
+                backPress()
+            }
+
             R.id.sub_menu_copy -> {
                 val clipboard =
                     requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                 val clip = ClipData.newPlainText("label", text)
                 clipboard?.setPrimaryClip(clip)
-                Logger.e(Thread.currentThread(), "clip $clip")
+//                Logger.e(Thread.currentThread(), "clip $clip")
 
                 Toast.makeText(requireContext(), "copied", Toast.LENGTH_SHORT).show()
             }
@@ -214,22 +203,13 @@ class SubCategoryViewFragment : Fragment(), Injectable, OnBackPressed {
 
     }
 
-    private fun bindDateTime(date: Date?, format: String?, emptyTxt: String): String {
-        return try {
-            if (date != null) {
-                val dateFormat = SimpleDateFormat(format, Locale.ENGLISH)
-                dateFormat.format(date)
-            } else {
-                emptyTxt
-            }
-        } catch (e: Exception) {
-            emptyTxt
-            //if (AppConfig.DEBUG_MODE) e.printStackTrace()
-        }
-
-    }
 
     override fun onBackPress() {
+        backPress()
+    }
+
+    private fun backPress() {
+        closeKeyboard()
         if (editedText.trim() == text) {
             Logger.e(Thread.currentThread(), "text not edited  $editedText")
             findNavController().popBackStack()
@@ -242,15 +222,28 @@ class SubCategoryViewFragment : Fragment(), Injectable, OnBackPressed {
                 subCategoryTable.timeStamp = System.currentTimeMillis().toString()
                 subCategoryTable.id = parentId.toInt()
                 viewModel.updateSubCategory(subCategoryTable)
+                Toast.makeText(requireContext(), "updated", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             } else {
                 val subCategoryTable = SubCategoryTable()
                 subCategoryTable.subCategoryId = entryId.toInt()
                 viewModel.deleteSubCategoryData(subCategoryTable)
+                Toast.makeText(requireContext(), "deleted", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             }
         }
     }
+
+    private fun closeKeyboard() {
+        // Check if no view has focus:
+        val view = requireActivity().currentFocus
+        view?.let { v ->
+            val imm =
+                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(v.windowToken, 0)
+        }
+    }
+
 
 }
 
