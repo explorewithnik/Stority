@@ -1,15 +1,13 @@
 package com.app.stority.homeSpace.owner.fragment
 
-import android.content.ClipData
-import android.content.ClipboardManager
+import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
-import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingComponent
@@ -18,7 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -29,6 +26,7 @@ import com.app.stority.di.Injectable
 import com.app.stority.helper.AppExecutors
 import com.app.stority.helper.Logger
 import com.app.stority.helper.autoCleared
+import com.app.stority.helper.isNullOrBlankOrEmpty
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.observer.HomeSpaceViewModel
 import com.app.stority.homeSpace.owner.activity.HomeSpaceActivity
@@ -49,14 +47,20 @@ class HomeSpaceFragment : Fragment(), Injectable {
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
     private var adapter by autoCleared<HomeSpaceAdapter>()
 
+    private var searchMenuClosed = true
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    var searchView: SearchView? = null
+    private var shouldHideSearchList: Boolean = true
 
     @Inject
     lateinit var executors: AppExecutors
     private val viewModel: HomeSpaceViewModel by viewModels { viewModelFactory }
     private var isFirstRun: Boolean = false
     private var sharedPref: SharedPreferences? = null
+    private var searchList: MutableList<HomeSpaceTable?> = ArrayList()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -65,8 +69,17 @@ class HomeSpaceFragment : Fragment(), Injectable {
             "My Notes",
             "HomeSpaceFragment"
         )
-        Logger.e(Thread.currentThread(), "onActivityCreated")
+        shouldHideSearchList = true
+        Logger.e(Thread.currentThread(), "virus onActivityCreated")
         changeListType(sharedPref?.getString(LIST_TYPE, GRID_TYPE))
+
+        if (!searchList.isNullOrEmpty() && searchList.size > 0) {
+            viewModel.apiCall.value = "5"
+            searchMenuClosed = true
+            Logger.e(Thread.currentThread(), "searchList ${searchList.size}")
+        } else {
+            Logger.e(Thread.currentThread(), "elseee")
+        }
 
         val stopAnim = viewModel.init(value = "1")
         if (stopAnim) isFirstRun =
@@ -81,7 +94,20 @@ class HomeSpaceFragment : Fragment(), Injectable {
             when (action) {
 
                 ACTION_ROOT -> {
+                    Logger.e(Thread.currentThread(), "id ${listData[0]?.id}")
+                    Logger.e(Thread.currentThread(), "text ${listData[0]?.text}")
+
                     val fragAction = HomeSpaceFragmentDirections.SubCategoryFragment()
+
+                    if (!searchList.isNullOrEmpty() && searchList.size > 0) {
+                        Logger.e(Thread.currentThread(), "searchList id ${searchList[0]?.id}")
+                        Logger.e(Thread.currentThread(), "searchList text ${searchList[0]?.text}")
+                        fragAction.fromSearch = true
+//                        searchList.clear()
+                    } else {
+                        fragAction.fromSearch = false
+                    }
+
                     fragAction.entryId = listData[0]?.id.toString()
                     fragAction.text = listData[0]?.text.toString()
                     navController().navigate(fragAction)
@@ -89,6 +115,13 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
                 ACTION_DELETE -> {
                     viewModel.deleteHomeSpaceListData(list = listData)
+                    Logger.e(Thread.currentThread(), "searchList size ${searchList.size}")
+                    Logger.e(Thread.currentThread(), "search menu closed $searchMenuClosed")
+                    if (!searchList.isNullOrEmpty() && searchList.size > 0) {
+                        searchList.removeAll(listData)
+                        searchMenuClosed = true
+                    }
+
                     requireActivity().invalidateOptionsMenu()
                 }
 
@@ -156,7 +189,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
                 Status.SUCCESS -> {
                     endProgress()
                     if (listResource.data != null) {
-                        Logger.e(Thread.currentThread(), "when")
+                        Logger.e(Thread.currentThread(), "data list ${listResource.data.size}")
                         adapter.submitList(listResource.data)
                         adapter.allListData.clear()
                         adapter.allListData.addAll(listResource.data)
@@ -228,7 +261,14 @@ class HomeSpaceFragment : Fragment(), Injectable {
         // Define the listener
         val expandListener = object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                adapter.submitList(adapter.allListData)
+                shouldHideSearchList = true
+                searchMenuClosed = true
+                adapter.searchMenuClosed = true
+                Logger.e(Thread.currentThread(), "onMenuItemActionCollapse")
+                if (!searchList.isNullOrEmpty()) searchList = ArrayList()
+                viewModel.apiCall.value = "1"
+//                binding.count = adapter.allListData.size
+//                binding.status = Status.SUCCESS
                 if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE) {
                     Handler().postDelayed({
                         if (isVisible) menu.findItem(R.id.menuList).isVisible = true
@@ -247,7 +287,35 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
             override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                 // Do something when expanded
+                searchMenuClosed = false
+                adapter.searchMenuClosed = false
+
+                Logger.e(Thread.currentThread(), "onMenuItemActionExpand ${searchList.size}")
+                Logger.e(
+                    Thread.currentThread(),
+                    "onMenuItemActionExpand list  ${Gson().toJson(searchList)}"
+                )
+
                 adapter.submitList(emptyList())
+                binding.count = 0
+                binding.status = Status.SUCCESS
+
+//                if (!searchList.isNullOrEmpty() && searchList.size > 0){
+////                    searchList.clear()
+//                    adapter.submitList(emptyList())
+//                    binding.count = 0
+//                    binding.status = Status.SUCCESS
+//                }
+
+//                if (searchList.isNullOrEmpty()) {
+//                    adapter.submitList(emptyList())
+//                    binding.count = 0
+//                    binding.status = Status.SUCCESS
+//                } else {
+//                    adapter.submitList(searchList)
+//                    binding.count = searchList.size
+//                    binding.status = Status.SUCCESS
+//                }
                 if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE) {
                     menu.findItem(R.id.menuList).isVisible = false
                 } else if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == LINEAR_TYPE) {
@@ -264,15 +332,75 @@ class HomeSpaceFragment : Fragment(), Injectable {
         // Get the MenuItem for the action item
         val actionMenuItem = menu.findItem(R.id.menuSearch)
 
-        val searchView = actionMenuItem.actionView as SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        searchView = actionMenuItem.actionView as SearchView
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
+                closeKeyboard()
                 Logger.e(Thread.currentThread(), "onQueryTextSubmit $query")
+//                query?.let { queryData ->
+//                    searchList = adapter.allListData.filter {
+//                        it?.text?.startsWith(queryData, true) ?: false
+//                    }.toMutableList()
+//
+//                    Logger.e(Thread.currentThread(), "list ${Gson().toJson(searchList)}")
+//
+//                    if (searchList.isNullOrEmpty()) {
+//                        Logger.e(Thread.currentThread(), "if called")
+////                        adapter.submitList(emptyList())
+//                        binding.count = 0
+//                        binding.status = Status.SUCCESS
+//                    } else {
+//                        Logger.e(Thread.currentThread(), "else called")
+//                        adapter.submitList(searchList)
+//                        binding.count = searchList.size
+//                        binding.status = Status.SUCCESS
+//                    }
+//                }
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 Logger.e(Thread.currentThread(), "onQueryTextChange $newText")
+                Logger.e(
+                    Thread.currentThread(),
+                    "onQueryTextChange searchMenuClosed $searchMenuClosed"
+                )
+                if (searchMenuClosed) return true
+                if (newText.isNullOrBlankOrEmpty()) {
+                    if (shouldHideSearchList) {
+                        adapter.submitList(emptyList())
+                        binding.count = 0
+                        binding.status = Status.SUCCESS
+                    } else {
+                        if (!searchList.isNullOrEmpty() && searchList.size > 0) {
+                            adapter.submitList(searchList)
+                            binding.count = searchList.size
+                            binding.status = Status.SUCCESS
+                        } else {
+                            adapter.submitList(emptyList())
+                            binding.count = 0
+                            binding.status = Status.SUCCESS
+                        }
+                    }
+                } else {
+                    newText?.let { queryData ->
+                        searchList = adapter.allListData.filter {
+                            it?.text?.startsWith(queryData, true) ?: false
+                        }.toMutableList()
+
+                        Logger.e(Thread.currentThread(), "list ${Gson().toJson(searchList)}")
+
+                        if (searchList.isNullOrEmpty()) {
+                            binding.count = 0
+                            binding.status = Status.SUCCESS
+                        } else {
+                            adapter.submitList(searchList)
+                            binding.count = searchList.size
+                            binding.status = Status.SUCCESS
+                        }
+                    }
+
+                }
                 return true
             }
         })
@@ -284,18 +412,24 @@ class HomeSpaceFragment : Fragment(), Injectable {
         menu.findItem(R.id.menuSearch)?.isVisible = true
         Logger.e(Thread.currentThread(), "itemCount  ${adapter.allListData.size}")
         menu.findItem(R.id.menuList)?.isVisible =
-            sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE && adapter.allListData.size > 0
+            sharedPref?.getString(
+                LIST_TYPE,
+                GRID_TYPE
+            ) == GRID_TYPE && adapter.allListData.size > 0 && searchList.isNullOrEmpty() && searchMenuClosed
 
         menu.findItem(R.id.menuGridList)?.isVisible =
             sharedPref?.getString(
                 LIST_TYPE,
                 GRID_TYPE
-            ) == LINEAR_TYPE && adapter.allListData.size > 0
+            ) == LINEAR_TYPE && adapter.allListData.size > 0 && searchList.isNullOrEmpty() && searchMenuClosed
+
+        menu.findItem(R.id.menuSearch)?.isVisible = adapter.allListData.size > 0
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
         when (item.itemId) {
+
 
             R.id.menuGridList -> {
                 changeListType(GRID_TYPE)
@@ -313,7 +447,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
     }
 
     companion object {
-        private const val LIST_TYPE = "listType"
+        const val LIST_TYPE = "listType"
         const val GRID_TYPE = "grid"
         const val LINEAR_TYPE = "linear"
         const val ACTION_CANCEL = -1
@@ -378,8 +512,15 @@ class HomeSpaceFragment : Fragment(), Injectable {
             }
 
             ACTION_RENAME -> {
-                viewModel.updateCategory(data)
+                shouldHideSearchList = false
+                if (data != null && data.text?.trim().isNullOrBlankOrEmpty())
+                    viewModel.deleteHomeSpaceData(data = data)
+                else viewModel.updateCategory(data)
+
                 adapter.notifyDataSetChanged()
+//                if (searchView?.isIconified == false) {
+//                    searchView?.isIconified = true
+//                }
             }
 
         }
@@ -496,5 +637,36 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
             }
         }
+    }
+
+    private fun closeKeyboard() {
+        // Check if no view has focus:
+        val view = requireActivity().currentFocus
+        view?.let { v ->
+            val imm =
+                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(v.windowToken, 0)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Logger.e(Thread.currentThread(), "virus onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Logger.e(Thread.currentThread(), "virus onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Logger.e(Thread.currentThread(), "virus onStop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Logger.e(Thread.currentThread(), "virus onDestroy")
+
     }
 }

@@ -51,7 +51,7 @@ class AddDataDailog(
             bind.categoryEt.afterTextChanged {
 
                 bind.categoryEt.layout?.let {
-                    if (it.lineCount > 1) {
+                    if (it.lineCount > 2) {
                         Logger.e(
                             Thread.currentThread(),
                             "line count ${it.lineCount}"

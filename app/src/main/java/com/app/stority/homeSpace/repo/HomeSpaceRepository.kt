@@ -41,6 +41,30 @@ class HomeSpaceRepository @Inject constructor(
         }.asLiveData()
     }
 
+    fun fetchHomeSearchSpaceDataListBySearch(
+        shouldFetch: Boolean,
+        query: String
+    ): LiveData<Resource<List<HomeSpaceTable>>> {
+
+        return object :
+            NetworkBoundResource<List<HomeSpaceTable>, HomeSpaceTableResponse>(executor) {
+
+            override fun shouldFetch(data: List<HomeSpaceTable>?) = shouldFetch
+
+            override fun uploadTag() = null
+
+            override fun createCall(): LiveData<ApiResponse<HomeSpaceTableResponse>> {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun saveCallResult(item: HomeSpaceTableResponse) {
+            }
+
+            override fun loadFromDb() = dao.fetchHomeSpaceDataBySearch(query = query)
+
+        }.asLiveData()
+    }
+
     fun fetchHomeSpaceData(id: String, shouldFetch: Boolean): LiveData<Resource<HomeSpaceTable>>? {
 
         return object : NetworkBoundResource<HomeSpaceTable, HomeSpaceTableResponse>(executor) {

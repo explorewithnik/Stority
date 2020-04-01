@@ -27,7 +27,7 @@ class CommonMethods {
                 "SubCategoryFragment" -> {
                     val actionBar = (requireActivity as AppCompatActivity).supportActionBar
                     actionBar?.setDisplayShowTitleEnabled(true)
-                    actionBar?.setDisplayHomeAsUpEnabled(false)
+                    actionBar?.setDisplayHomeAsUpEnabled(true)
                     actionBar?.title = title
                 }
 

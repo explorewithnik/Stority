@@ -58,7 +58,8 @@
             android:layout_height="match_parent"
             android:visibility="@{count != null &amp;&amp; count > 0 &amp;&amp; status != Status.LOADING ? View.GONE : View.VISIBLE,default=gone}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/progress" />
+            app:layout_constraintTop_toBottomOf="@id/progress"
+             />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"

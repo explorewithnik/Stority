@@ -1,5 +1,6 @@
 package com.app.stority.homeSpace.observer
 
+import android.util.Log
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
@@ -20,6 +21,7 @@ class HomeSpaceViewModel @Inject constructor(
 ) : ViewModel(), Observable {
     private val callbacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
     var apiCall = MutableLiveData<String>()
+    var searchApiCal = MutableLiveData<String>()
 
     override fun addOnPropertyChangedCallback(
         callback: Observable.OnPropertyChangedCallback
@@ -51,14 +53,27 @@ class HomeSpaceViewModel @Inject constructor(
 
     fun init(value: String): Boolean {
         Logger.e(Thread.currentThread(), "value")
-        return if (apiCall.value == value) {
-            true
-        } else {
-            Logger.e(Thread.currentThread(), "init")
-            apiCall.value = value
-            false
+        return when {
+            apiCall.value == value -> {
+                Logger.e(Thread.currentThread(), "init apiCall.value ")
+                true
+            }
+            value == "2" -> {
+                Logger.e(Thread.currentThread(), "init value = 2 ")
+                apiCall.value = value
+                false
+            }
+            else -> {
+                Logger.e(Thread.currentThread(), "init else")
+                apiCall.value = value
+                false
+            }
         }
+    }
 
+    fun initSearch(query: String) {
+        Logger.e(Thread.currentThread(), "initSearch")
+        searchApiCal.value = query
     }
 
     fun deleteHomeSpaceData(data: HomeSpaceTable?) {

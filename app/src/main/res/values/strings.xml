@@ -88,4 +88,7 @@
     <string name="share">share</string>
     <string name="remove_all">Remove All</string>
     <string name="more">more</string>
+    <string name="empty_view_text">empty</string>
+    <string name="no_note_available">No note available !</string>
+    <string name="no_data_available">No data available !</string>
 </resources>

@@ -31,6 +31,9 @@ interface HomeSpaceDao {
     @Query("SELECT * FROM HomeSpaceTable ORDER BY timeStamp DESC")
     fun fetchAllHomeSpaceData(): LiveData<List<HomeSpaceTable>>
 
+    @Query("SELECT * FROM HomeSpaceTable WHERE text LIKE '%' || :query || '%' ")
+    fun fetchHomeSpaceDataBySearch(query: String): LiveData<List<HomeSpaceTable>>
+
     @Query("SELECT * FROM SubCategoryTable")
     fun fetchAllSubCategoryData(): LiveData<List<SubCategoryTable>>
 

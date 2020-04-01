@@ -1,23 +1,21 @@
 package com.app.stority.homeSpace.owner.fragment
 
-import android.content.ClipData
-import android.content.ClipboardManager
+import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
-import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -28,18 +26,20 @@ import com.app.stority.di.Injectable
 import com.app.stority.helper.AppExecutors
 import com.app.stority.helper.Logger
 import com.app.stority.helper.autoCleared
+import com.app.stority.helper.isNullOrBlankOrEmpty
 import com.app.stority.homeSpace.data.SubCategoryTable
 import com.app.stority.homeSpace.observer.SubCategoryViewModel
 import com.app.stority.homeSpace.owner.activity.HomeSpaceActivity
 import com.app.stority.homeSpace.owner.activity.HomeSpaceActivity.Companion.FIRST_TIME_LAUNCH_2
 import com.app.stority.homeSpace.owner.adapter.SubCategoryAdapter
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_EDIT
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.GRID_TYPE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.LINEAR_TYPE
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.LIST_TYPE
 import com.app.stority.remoteUtils.Status
 import com.app.stority.widget.AddSubCategoryDailog
 import com.app.stority.widget.CommonMethods
 import com.app.stority.widget.MultipleOptionDailogSubCategory
-import com.app.stority.widget.OnBackPressed
 import com.app.tooltip.ClosePolicy
 import com.app.tooltip.Tooltip
 import com.app.tooltip.Typefaces
@@ -47,30 +47,41 @@ import com.google.gson.Gson
 import javax.inject.Inject
 
 
-class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
+class SubCategoryFragment : Fragment(), Injectable {
     private var tooltip: Tooltip? = null
     var binding by autoCleared<FragmentSubCategoryBinding>()
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
     private var adapter by autoCleared<SubCategoryAdapter>()
 
+    private var searchList: MutableList<SubCategoryTable?> = ArrayList()
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+    var searchView: SearchView? = null
 
     @Inject
     lateinit var executors: AppExecutors
     private val viewModel: SubCategoryViewModel by viewModels { viewModelFactory }
     private var isFirstRun: Boolean? = null
     private var sharedPref: SharedPreferences? = null
+    private var searchMenuClosed = true
 
     private var entryId = ""
+    private var fromSearch: Boolean = false
     private var text = ""
+    private var shouldHideSearchList: Boolean = true
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
-
+        closeKeyboard()
+        shouldHideSearchList = true
         entryId = savedInstanceState?.getString(entryId)
             ?: SubCategoryFragmentArgs.fromBundle(arguments!!).entryId
+
+        fromSearch = savedInstanceState?.getBoolean(fromSearch.toString())
+            ?: SubCategoryFragmentArgs.fromBundle(arguments!!).fromSearch
+
+        Logger.e(Thread.currentThread(), "fromSearch $fromSearch")
 
         Logger.e(Thread.currentThread(), "entryId $entryId")
 
@@ -88,6 +99,13 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
 
         changeSubListType(sharedPref?.getString(entryId, GRID_TYPE))
 
+        if (!searchList.isNullOrEmpty() && searchList.size > 0) {
+            viewModel.apiCall.value = "5"
+            searchMenuClosed = true
+            Logger.e(Thread.currentThread(), "searchList ${searchList.size}")
+        } else {
+            Logger.e(Thread.currentThread(), "elseee")
+        }
 
         val stopAnim = viewModel.init(entryId)
         if (stopAnim) isFirstRun =
@@ -117,6 +135,10 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
 
                 ACTION_DELETE -> {
                     viewModel.deleteSubCategoryListData(list = listData)
+                    if (!searchList.isNullOrEmpty() && searchList.size > 0) {
+                        searchList.removeAll(listData)
+                        searchMenuClosed = true
+                    }
                     requireActivity().invalidateOptionsMenu()
                 }
 
@@ -126,6 +148,13 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
 
                 ACTION_FAB_HIDE -> {
                     binding.fab.hide()
+                }
+
+                ACTION_EDIT -> {
+                    if (!listData.isNullOrEmpty() && listData.isNotEmpty()) {
+                        onActionCallback(listData[0], ACTION_RENAME)
+                    }
+
                 }
 
                 ACTION_COPY -> {
@@ -170,10 +199,6 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
                     endProgress()
                     if (listResource.data != null) {
                         adapter.submitList(listResource.data)
-//                        adapter.submitList(
-//                            listResource.data.filter {
-//                                it.text?.isNotEmpty()!! ||it.text?.isNotBlank()!!
-//                            })
                         binding.recycler.smoothScrollToPosition(0)
                         adapter.allListData.clear()
                         adapter.allListData.addAll(listResource.data)
@@ -222,12 +247,12 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
             dataBindingComponent
         )
 
-        binding.fab.startAnimation(
-            AnimationUtils.loadAnimation(
-                requireContext(),
-                R.anim.rotate
-            )
-        )
+//        binding.fab.startAnimation(
+//            AnimationUtils.loadAnimation(
+//                requireContext(),
+//                R.anim.rotate
+//            )
+//        )
 
         binding.fab.setOnClickListener {
             binding.fab.hide()
@@ -258,29 +283,153 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.sub_category_menu, menu)
+
+        // Define the listener
+        val expandListener = object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                shouldHideSearchList = true
+                searchMenuClosed = true
+                adapter.searchMenuClosed = true
+                Logger.e(Thread.currentThread(), "onMenuItemActionCollapse")
+                if (!searchList.isNullOrEmpty()) searchList = ArrayList()
+                viewModel.apiCall.value = entryId
+
+                if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE) {
+                    Handler().postDelayed({
+                        if (isVisible) menu.findItem(R.id.menuList).isVisible = true
+                    }, 1)
+                } else if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == LINEAR_TYPE) {
+                    Handler().postDelayed({
+                        if (isVisible) menu.findItem(R.id.menuGridList).isVisible = true
+                    }, 1)
+                }
+                Handler().postDelayed({
+                    if (isVisible) binding.fab.show()
+                }, 200)
+
+                return true // Return true to collapse action view
+            }
+
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                // Do something when expanded
+                searchMenuClosed = false
+                adapter.searchMenuClosed = false
+                Logger.e(Thread.currentThread(), "onMenuItemActionExpand ${searchList.size}")
+                Logger.e(
+                    Thread.currentThread(),
+                    "onMenuItemActionExpand list  ${Gson().toJson(searchList)}"
+                )
+                Logger.e(Thread.currentThread(), "shouldHideSearchList $shouldHideSearchList")
+
+                adapter.submitList(emptyList())
+                binding.count = 0
+                binding.status = Status.SUCCESS
+
+
+                if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == GRID_TYPE) {
+                    menu.findItem(R.id.menuList).isVisible = false
+                } else if (sharedPref?.getString(LIST_TYPE, GRID_TYPE) == LINEAR_TYPE) {
+                    menu.findItem(R.id.menuGridList).isVisible = false
+                }
+                Handler().postDelayed({
+                    if (isVisible) binding.fab.hide()
+                }, 200)
+
+                return true // Return true to expand action view
+            }
+        }
+
+        // Get the MenuItem for the action item
+        val actionMenuItem = menu.findItem(R.id.menuSearch2)
+
+        searchView = actionMenuItem.actionView as SearchView
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                closeKeyboard()
+                Logger.e(Thread.currentThread(), "onQueryTextSubmit $query")
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                Logger.e(Thread.currentThread(), "onQueryTextChange $newText")
+                Logger.e(Thread.currentThread(), "shouldHideSearchList $shouldHideSearchList")
+                Logger.e(
+                    Thread.currentThread(),
+                    "onQueryTextChange searchMenuClosed $searchMenuClosed"
+                )
+                if (searchMenuClosed) return true
+                if (newText.isNullOrBlankOrEmpty()) {
+
+                    if (shouldHideSearchList) {
+                        adapter.submitList(emptyList())
+                        binding.count = 0
+                        binding.status = Status.SUCCESS
+                    } else {
+                        if (!searchList.isNullOrEmpty() && searchList.size > 0) {
+                            adapter.submitList(searchList)
+                            binding.count = searchList.size
+                            binding.status = Status.SUCCESS
+                        } else {
+                            adapter.submitList(emptyList())
+                            binding.count = 0
+                            binding.status = Status.SUCCESS
+                        }
+                    }
+
+                } else {
+                    newText?.let { queryData ->
+                        searchList = adapter.allListData.filter {
+                            it?.text?.startsWith(queryData, true) ?: false
+                        }.toMutableList()
+
+                        Logger.e(Thread.currentThread(), "list ${Gson().toJson(searchList)}")
+
+                        if (searchList.isNullOrEmpty()) {
+                            Logger.e(Thread.currentThread(), "searchList isNullOrEmpty() ")
+                            adapter.submitList(emptyList())
+                            binding.count = 0
+                            binding.status = Status.SUCCESS
+                        } else {
+                            Logger.e(Thread.currentThread(), "searchList not isNullOrEmpty() ")
+                            adapter.submitList(searchList)
+                            binding.count = searchList.size
+                            binding.status = Status.SUCCESS
+                        }
+                    }
+
+                }
+                return true
+            }
+        })
+        // Assign the listener to that action item
+        actionMenuItem?.setOnActionExpandListener(expandListener)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        menu.findItem(R.id.menuSearch)?.isVisible = true
+        menu.findItem(R.id.menuSearch2)?.isVisible = true
 
         menu.findItem(R.id.menuList)?.isVisible =
             sharedPref?.getString(
                 entryId,
                 GRID_TYPE
-            ) == GRID_TYPE && adapter.allListData.size > 0
+            ) == GRID_TYPE && adapter.allListData.size > 0 && searchList.isNullOrEmpty() && searchMenuClosed
 
         menu.findItem(R.id.menuGridList)?.isVisible =
             sharedPref?.getString(
                 entryId,
                 GRID_TYPE
-            ) == LINEAR_TYPE && adapter.allListData.size > 0
+            ) == LINEAR_TYPE && adapter.allListData.size > 0 && searchList.isNullOrEmpty() && searchMenuClosed
+
+        menu.findItem(R.id.menuSearch2)?.isVisible = adapter.allListData.size > 0
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-//            R.id.subCategoryMenuSearch -> {
-//                Logger.e(Thread.currentThread(), "search")
-//            }
+
+            android.R.id.home -> {
+                findNavController().popBackStack()
+            }
+
 
             R.id.menuGridList -> {
                 changeSubListType(GRID_TYPE)
@@ -300,6 +449,7 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
     companion object {
         const val ENTRY_ID = "entry_id"
         const val TEXT_ID = "text_id"
+        const val FROM_SEARCH = "from_search"
         const val ACTION_CANCEL = -1
         const val ACTION_EDIT = "edit"
         const val ACTION_NEW = 0
@@ -355,16 +505,21 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
     private fun onSaveCallback(data: SubCategoryTable?, action: Int) {
         when (action) {
             ACTION_RENAME -> {
-                viewModel.updateSubCategory(data)
+                shouldHideSearchList = false
+                if (data != null && data.text?.trim().isNullOrBlankOrEmpty())
+                    viewModel.deleteSubCategoryData(data = data)
+                else viewModel.updateSubCategory(data)
+
                 adapter.notifyDataSetChanged()
+
+//                searchMenuClosed=true
+//                if (searchView?.isIconified == false) {
+//                    searchView?.isIconified = true
+//                }
             }
 
             ACTION_NEW -> {
                 if (!data?.text.isNullOrBlank()) {
-                    Logger.e(
-                        Thread.currentThread(),
-                        "count ${binding.recycler.smoothScrollToPosition(0)}"
-                    )
                     adapter.allListData.clear()
                     viewModel.insertSubCategory(entryId, data)
                     smoothScroll()
@@ -416,6 +571,7 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
         super.onSaveInstanceState(outState)
         outState.putString(ENTRY_ID, entryId)
         outState.putString(TEXT_ID, text)
+        outState.putBoolean(FROM_SEARCH, fromSearch)
     }
 
     private fun changeSubListType(subType: String?) {
@@ -480,7 +636,6 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
                     ?.show(binding.fab, Tooltip.Gravity.LEFT, true)
             }
         }
-
     }
 
     private fun smoothScroll() {
@@ -490,8 +645,13 @@ class SubCategoryFragment : Fragment(), Injectable, OnBackPressed {
         }, 200)
     }
 
-    override fun onBackPress() {
-        TODO("Not yet implemented")
+    private fun closeKeyboard() {
+        // Check if no view has focus:
+        val view = requireActivity().currentFocus
+        view?.let { v ->
+            val imm =
+                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(v.windowToken, 0)
+        }
     }
-
 }

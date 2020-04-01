@@ -56,6 +56,7 @@ class HomeSpaceAdapter(
         }
     }
 ) {
+    var searchMenuClosed: Boolean = true
     var tooltip: Tooltip? = null
     var allListData = ArrayList<HomeSpaceTable?>()
     private var showAddAllMenuIcon = false
@@ -154,6 +155,11 @@ class HomeSpaceAdapter(
             val inflater = mode?.menuInflater
             inflater?.inflate(R.menu.multi_select_menu, menu)
             menu?.findItem(R.id.menuAddAll)?.isVisible = false
+            Logger.e(
+                Thread.currentThread(),
+                "onCreateActionMode searchMenuClosed $searchMenuClosed"
+            )
+            if (!searchMenuClosed) menu?.findItem(R.id.menuRemoveAll)?.isVisible = false
             return true
         }
 
@@ -161,13 +167,24 @@ class HomeSpaceAdapter(
             mode: ActionMode?,
             menu: Menu?
         ): Boolean {
-            if (showAddAllMenuIcon) {
-                menu?.findItem(R.id.menuAddAll)?.isVisible = true
+            Logger.e(
+                Thread.currentThread(),
+                "onPrepareActionMode searchMenuClosed $searchMenuClosed"
+            )
+
+            if (searchMenuClosed) {
+                if (showAddAllMenuIcon) {
+                    menu?.findItem(R.id.menuAddAll)?.isVisible = true
+                    menu?.findItem(R.id.menuRemoveAll)?.isVisible = false
+                } else if (showRemoveAllMenuIcon) {
+                    menu?.findItem(R.id.menuAddAll)?.isVisible = false
+                    menu?.findItem(R.id.menuRemoveAll)?.isVisible = true
+                }
+            } else {
                 menu?.findItem(R.id.menuRemoveAll)?.isVisible = false
-            } else if (showRemoveAllMenuIcon) {
                 menu?.findItem(R.id.menuAddAll)?.isVisible = false
-                menu?.findItem(R.id.menuRemoveAll)?.isVisible = true
             }
+
 
             if (showMoreOption) {
                 menu?.findItem(R.id.copy)?.isVisible = true
@@ -238,8 +255,8 @@ class HomeSpaceAdapter(
                     .create()
 
                 tooltip?.doOnHidden {
-                    tooltip = null
-                }
+                        tooltip = null
+                    }
                     ?.doOnFailure {
 
                     }

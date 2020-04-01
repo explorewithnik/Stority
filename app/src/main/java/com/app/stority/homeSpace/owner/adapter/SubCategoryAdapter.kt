@@ -62,6 +62,7 @@ class SubCategoryAdapter(
         }
     }
 ) {
+    var searchMenuClosed: Boolean = true
     private var tooltip: Tooltip? = null
     var allListData = ArrayList<SubCategoryTable?>()
     private var showAddAllMenuIcon = false
@@ -126,10 +127,10 @@ class SubCategoryAdapter(
                     mode?.finish()
                 }
 
-//                R.id.edit -> {
-//                    callback?.invoke(selectedItems, ACTION_EDIT)
-//                    mode?.finish()
-//                }
+                R.id.edit -> {
+                    callback?.invoke(selectedItems, ACTION_EDIT)
+                    mode?.finish()
+                }
 
                 R.id.menuShare -> {
                     callback?.invoke(selectedItems, ACTION_SHARE)
@@ -160,7 +161,7 @@ class SubCategoryAdapter(
             val inflater = mode?.menuInflater
             inflater?.inflate(R.menu.multi_select_menu, menu)
             menu?.findItem(R.id.menuAddAll)?.isVisible = false
-
+            if (!searchMenuClosed) menu?.findItem(R.id.menuRemoveAll)?.isVisible = false
             return true
         }
 
@@ -168,23 +169,29 @@ class SubCategoryAdapter(
             mode: ActionMode?,
             menu: Menu?
         ): Boolean {
-            menu?.findItem(R.id.edit)?.isVisible = false
-            if (showAddAllMenuIcon) {
-                menu?.findItem(R.id.menuAddAll)?.isVisible = true
+//            menu?.findItem(R.id.edit)?.isVisible = false
+
+            if (searchMenuClosed) {
+                if (showAddAllMenuIcon) {
+                    menu?.findItem(R.id.menuAddAll)?.isVisible = true
+                    menu?.findItem(R.id.menuRemoveAll)?.isVisible = false
+                } else if (showRemoveAllMenuIcon) {
+                    menu?.findItem(R.id.menuAddAll)?.isVisible = false
+                    menu?.findItem(R.id.menuRemoveAll)?.isVisible = true
+                }
+            } else {
                 menu?.findItem(R.id.menuRemoveAll)?.isVisible = false
-            } else if (showRemoveAllMenuIcon) {
                 menu?.findItem(R.id.menuAddAll)?.isVisible = false
-                menu?.findItem(R.id.menuRemoveAll)?.isVisible = true
             }
 
             if (showMoreOption) {
                 menu?.findItem(R.id.copy)?.isVisible = true
-//                menu?.findItem(R.id.edit)?.isVisible = true
+                menu?.findItem(R.id.edit)?.isVisible = true
                 menu?.findItem(R.id.menuShare)?.isVisible = true
                 menu?.findItem(R.id.action_more)?.isVisible = true
             } else {
                 menu?.findItem(R.id.copy)?.isVisible = false
-//                menu?.findItem(R.id.edit)?.isVisible = false
+                menu?.findItem(R.id.edit)?.isVisible = false
                 menu?.findItem(R.id.menuShare)?.isVisible = false
                 menu?.findItem(R.id.action_more)?.isVisible = false
             }
@@ -241,8 +248,8 @@ class SubCategoryAdapter(
                     .create()
 
                 tooltip?.doOnHidden {
-                    tooltip = null
-                }
+                        tooltip = null
+                    }
                     ?.doOnFailure {
 
                     }

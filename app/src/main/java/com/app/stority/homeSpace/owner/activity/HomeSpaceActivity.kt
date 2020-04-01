@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.app.stority.R
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment
 import com.app.stority.homeSpace.owner.fragment.SubCategoryViewFragment
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
@@ -52,8 +54,16 @@ class HomeSpaceActivity : AppCompatActivity(), HasSupportFragmentInjector {
         val fragment = container.childFragmentManager.fragments[0]
         if (fragment != null && fragment is SubCategoryViewFragment) {
             fragment.onBackPress()
-        } else {
+        } /*else if (fragment != null && fragment is SubCategoryFragment) {
+            fragment.onBackPress()
+        } */ else {
             super.onBackPressed()
         }
+
+//        if (fragment != null && fragment is HomeSpaceFragment) {
+//            fragment.onBackPress()
+//        } else {
+//            super.onBackPressed()
+//        }
     }
 }
