@@ -243,7 +243,7 @@ class HomeSpaceAdapter(
                 val metrics = context.resources.displayMetrics
                 tooltip = Tooltip.Builder(context)
                     .anchor(binding.cv, 0, 0, true)
-                    .text("tap on card to add points")
+                    .text("tap on card to add points or long press to copy, share, edit or delete it")
                     .styleId(R.style.ToolTipAltStyle)
                     .typeface(Typefaces[context, "font/roboto.ttf"])
                     .maxWidth(metrics.widthPixels / 2)

@@ -9,6 +9,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.app.stority.helper.Logger
 import com.app.stority.homeSpace.data.HomeSpaceTable
+import com.app.stority.homeSpace.data.SubCategoryTable
 import com.app.stority.homeSpace.repo.HomeSpaceRepository
 import com.app.stority.remoteUtils.AbsentLiveData
 import com.app.stority.remoteUtils.Resource
@@ -21,6 +22,7 @@ class HomeSpaceViewModel @Inject constructor(
 ) : ViewModel(), Observable {
     private val callbacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
     var apiCall = MutableLiveData<String>()
+    var subApiCall = MutableLiveData<String>()
     var searchApiCal = MutableLiveData<String>()
 
     override fun addOnPropertyChangedCallback(
@@ -50,6 +52,14 @@ class HomeSpaceViewModel @Inject constructor(
             else -> repo.fetchHomeSpaceDataList(false)
         }
     }
+
+    var subResult: LiveData<Resource<List<SubCategoryTable>>> =
+        Transformations.switchMap(subApiCall) {
+            when (subApiCall.value) {
+                null -> AbsentLiveData.create()
+                else -> repo.fetchSubCategoryDataList(false, subApiCall.value)
+            }
+        }
 
     fun init(value: String): Boolean {
         Logger.e(Thread.currentThread(), "value")

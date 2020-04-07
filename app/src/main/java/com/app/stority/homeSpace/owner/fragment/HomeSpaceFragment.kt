@@ -163,6 +163,8 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Note")
                     sharingIntent.putExtra(Intent.EXTRA_TEXT, listData[0]?.text)
                     startActivity(Intent.createChooser(sharingIntent, "Share via"))
+//                    viewModel.subApiCall.value = listData[0]?.id.toString()
+                    Logger.e(Thread.currentThread(), "ACTION_share id ${listData[0]?.id}")
                 }
 
                 else -> {
@@ -201,6 +203,39 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
                     endProgress()
                     if (listResource.code == 502) {
+                    } else {
+                        //Toast.makeText(context,"error",Toast.LENGTH_SHORT).show()
+                    }
+                }
+                Status.LOADING -> {
+                    startProgress()
+                }
+            }
+            requireActivity().invalidateOptionsMenu()
+        })
+
+        viewModel.subResult.observe(viewLifecycleOwner, Observer { subList ->
+            endProgress()
+            when (subList?.status) {
+                Status.SUCCESS -> {
+                    endProgress()
+                    if (subList.data != null) {
+                        Logger.e(
+                            Thread.currentThread(),
+                            "sub data list ${Gson().toJson(subList.data)}"
+                        )
+
+                    } else {
+                        Logger.e(
+                            Thread.currentThread(),
+                            "sub data empty list ${Gson().toJson(subList.data)}"
+                        )
+                    }
+                }
+                Status.ERROR -> {
+
+                    endProgress()
+                    if (subList.code == 502) {
                     } else {
                         //Toast.makeText(context,"error",Toast.LENGTH_SHORT).show()
                     }

@@ -236,7 +236,7 @@ class SubCategoryAdapter(
 
                 tooltip = Tooltip.Builder(context)
                     .anchor(binding.cv, 0, 0, true)
-                    .text("tap on card to copy, edit or delete note")
+                    .text("tap or long press on card to share copy, edit or delete note")
                     .styleId(R.style.ToolTipAltStyle)
                     .typeface(Typefaces[context, "font/roboto.ttf"])
                     .maxWidth(metrics.widthPixels / 2)

@@ -3,9 +3,7 @@ package com.app.stority.homeSpace.repo
 
 import androidx.lifecycle.LiveData
 import com.app.stority.helper.AppExecutors
-import com.app.stority.homeSpace.data.HomeSpaceDao
-import com.app.stority.homeSpace.data.HomeSpaceTable
-import com.app.stority.homeSpace.data.HomeSpaceTableResponse
+import com.app.stority.homeSpace.data.*
 import com.app.stority.remoteUtils.ApiResponse
 import com.app.stority.remoteUtils.NetworkBoundResource
 import com.app.stority.remoteUtils.Resource
@@ -106,6 +104,29 @@ class HomeSpaceRepository @Inject constructor(
                 dao.deleteHomeSpaceData(id = it?.id)
             }
         }
+    }
+
+    fun fetchSubCategoryDataList(
+        shouldFetch: Boolean,
+        id: String?
+    ): LiveData<Resource<List<SubCategoryTable>>> {
+        return object :
+            NetworkBoundResource<List<SubCategoryTable>, SubCategoryTableResponse>(executor) {
+
+            override fun shouldFetch(data: List<SubCategoryTable>?) = shouldFetch
+
+            override fun uploadTag() = null
+
+            override fun createCall(): LiveData<ApiResponse<SubCategoryTableResponse>> {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun saveCallResult(item: SubCategoryTableResponse) {
+            }
+
+            override fun loadFromDb() = dao.fetchSubCategoryDataList(id?.toInt())
+
+        }.asLiveData()
     }
 }
 
