@@ -31,5 +31,8 @@ data class SubCategoryTable(
     var text: String? = null,
 
     @field : SerializedName("timeStamp")
-    var timeStamp: String? = System.currentTimeMillis().toString()
+    var timeStamp: String? = System.currentTimeMillis().toString(),
+
+    @field: SerializedName("backGroundColor")
+    var backGroundColor: String? = "-1"
 )

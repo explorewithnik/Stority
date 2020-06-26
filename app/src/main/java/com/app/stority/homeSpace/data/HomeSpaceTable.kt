@@ -1,7 +1,9 @@
 package com.app.stority.homeSpace.data
 
+import android.graphics.Color
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "HomeSpaceTable")
@@ -17,8 +19,10 @@ data class HomeSpaceTable(
     var text: String? = null,
 
     @field : SerializedName("timeStamp")
-    var timeStamp: String? = System.currentTimeMillis().toString()
+    var timeStamp: String? = System.currentTimeMillis().toString(),
 
+    @field: SerializedName("backGroundColor")
+    var backGroundColor: String? = "-1"
 )
 
 

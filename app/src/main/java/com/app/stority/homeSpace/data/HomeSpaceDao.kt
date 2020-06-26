@@ -46,6 +46,12 @@ interface HomeSpaceDao {
     @Query("DELETE FROM HomeSpaceTable WHERE id =:id")
     fun deleteHomeSpaceData(id: Int?)
 
+    @Query("UPDATE HomeSpaceTable SET backGroundColor =:color WHERE id =:id")
+    fun updateCardColor(id: Int?, color: String)
+
+    @Query("UPDATE SubCategoryTable SET backGroundColor =:color WHERE subCategoryId =:id")
+    fun updateSubCardColor(id: Int?, color: String)
+
     @Delete
     fun deleteAllHomeSpaceData(data: HomeSpaceTable?)
 

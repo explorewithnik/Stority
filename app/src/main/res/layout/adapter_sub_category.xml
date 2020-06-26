@@ -4,7 +4,6 @@
     xmlns:tool="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="data"
             type="com.app.stority.homeSpace.data.SubCategoryTable" />
@@ -17,11 +16,11 @@
         android:layout_margin="6dp"
         android:animateLayoutChanges="true"
         android:minHeight="110dp"
-        app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
+            android:id="@+id/cl"
             android:layout_height="wrap_content"
             app:layout_constraintWidth_default="percent"
             app:layout_constraintWidth_percent="0.5">
@@ -41,7 +40,6 @@
                 android:paddingRight="15dp"
                 android:paddingBottom="2dp"
                 android:text='@{data.text==null ? "N/A" : data.text}'
-                android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toTopOf="@id/date_text"
                 app:layout_constraintEnd_toEndOf="parent"

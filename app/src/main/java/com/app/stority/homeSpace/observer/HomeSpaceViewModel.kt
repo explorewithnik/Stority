@@ -1,6 +1,5 @@
 package com.app.stority.homeSpace.observer
 
-import android.util.Log
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
@@ -96,6 +95,10 @@ class HomeSpaceViewModel @Inject constructor(
 
     fun deleteHomeSpaceListData(list: List<HomeSpaceTable?>) {
         repo.deleteHomeSpaceDataList(list = list)
+    }
+
+    fun updateColor(list: List<HomeSpaceTable?>, color: String) {
+        repo.updateBackGroundColor(list = list, color = color)
     }
 
     fun insertCategory(data: HomeSpaceTable?) {

@@ -73,6 +73,16 @@ class SubCategoryRepository @Inject constructor(
     fun deleteSubCategoryData(data: SubCategoryTable?) =
         executor.diskIO().execute { dao.deleteSubCategoryData(id = data?.subCategoryId) }
 
+    fun updateBackGroundColor(
+        list: List<SubCategoryTable?>,
+        color: String
+    ) {
+        list.forEach {
+            executor.diskIO().execute {
+                dao.updateSubCardColor(id = it?.subCategoryId, color = color)
+            }
+        }
+    }
 
     fun deleteSubCategoryDataList(list: List<SubCategoryTable?>) {
         list.forEach {

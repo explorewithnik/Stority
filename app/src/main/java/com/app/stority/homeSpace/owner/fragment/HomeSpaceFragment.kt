@@ -10,6 +10,7 @@ import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -90,7 +91,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
             context = requireContext(),
             dataBindingComponent = dataBindingComponent,
             appExecutors = executors
-        ) { listData, action ->
+        ) { listData, action, color ->
             when (action) {
 
                 ACTION_ROOT -> {
@@ -110,6 +111,7 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
                     fragAction.entryId = listData[0]?.id.toString()
                     fragAction.text = listData[0]?.text.toString()
+                    fragAction.backGroundColor = listData[0]?.backGroundColor.toString()
                     navController().navigate(fragAction)
                 }
 
@@ -156,6 +158,18 @@ class HomeSpaceFragment : Fragment(), Injectable {
 
                 }
 
+                ACTION_MARK_AS_DONE -> {
+                    viewModel.updateColor(list = listData, color = color)
+                }
+
+                ACTION_MARK_AS_PROGRESS -> {
+                    viewModel.updateColor(list = listData, color = color)
+                }
+
+                ACTION_MARK_AS_PENDING -> {
+                    viewModel.updateColor(list = listData, color = color)
+                }
+
                 ACTION_SHARE -> {
                     Logger.e(Thread.currentThread(), "ACTION_share ${Gson().toJson(listData[0])}")
                     val sharingIntent = Intent(Intent.ACTION_SEND)
@@ -191,10 +205,14 @@ class HomeSpaceFragment : Fragment(), Injectable {
                 Status.SUCCESS -> {
                     endProgress()
                     if (listResource.data != null) {
-                        Logger.e(Thread.currentThread(), "data list ${listResource.data.size}")
+                        Logger.e(
+                            Thread.currentThread(),
+                            "data list ${Gson().toJson(listResource.data)}"
+                        )
                         adapter.submitList(listResource.data)
                         adapter.allListData.clear()
                         adapter.allListData.addAll(listResource.data)
+
                     } else {
                         adapter.submitList(emptyList())
                     }
@@ -492,6 +510,9 @@ class HomeSpaceFragment : Fragment(), Injectable {
         const val ACTION_MORE = "more"
         const val ACTION_MORE_INT = 2
         const val ACTION_COPY = "copy"
+        const val ACTION_MARK_AS_DONE = "done"
+        const val ACTION_MARK_AS_PROGRESS = "progress"
+        const val ACTION_MARK_AS_PENDING = "pending"
         const val ACTION_DELETE = "delete"
         const val ACTION_SHARE = "share"
         const val ACTION_FAB_SHOW = "fabShow"
@@ -659,8 +680,8 @@ class HomeSpaceFragment : Fragment(), Injectable {
                     .create()
 
                 tooltip?.doOnHidden {
-                        tooltip = null
-                    }
+                    tooltip = null
+                }
                     ?.doOnFailure {
 
                     }

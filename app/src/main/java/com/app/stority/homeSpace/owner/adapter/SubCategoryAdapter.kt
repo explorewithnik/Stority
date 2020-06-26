@@ -20,28 +20,34 @@ import com.app.stority.helper.DataBoundListAdapter
 import com.app.stority.helper.Logger
 import com.app.stority.homeSpace.data.HomeSpaceTable
 import com.app.stority.homeSpace.data.SubCategoryTable
-import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ALL
-import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_DELETE
-import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_HIDE
-import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_SHOW
-import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ROOT
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_ALL
 import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_COPY
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_DELETE
 import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_EDIT
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_FAB_HIDE
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_FAB_SHOW
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_MARK_AS_DONE
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_MARK_AS_PENDING
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_MARK_AS_PROGRESS
+import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_ROOT
 import com.app.stority.homeSpace.owner.fragment.SubCategoryFragment.Companion.ACTION_SHARE
 import com.app.stority.widget.ConfirmationDailog
+import com.app.stority.widget.ConfirmationDailog.Companion.SUB_CATEGORY_DATA
 import com.app.stority.widget.ConfirmationDailog.Companion.SUB_CATEGORY_LIST_DATA
 import com.app.tooltip.ClosePolicy
 import com.app.tooltip.Tooltip
 import com.app.tooltip.Typefaces
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
+import com.google.gson.Gson
 
 
 class SubCategoryAdapter(
+    private var backGroundColor: String,
     private var isFirstRun: Boolean?,
     private val context: Context,
     private val dataBindingComponent: DataBindingComponent,
     val appExecutors: AppExecutors,
-    private val callback: ((List<SubCategoryTable?>, action: String) -> Unit)?
+    private val callback: ((List<SubCategoryTable?>, action: String, color: String) -> Unit)?
 
 
 ) : DataBoundListAdapter<SubCategoryTable, AdapterSubCategoryBinding>(
@@ -51,26 +57,26 @@ class SubCategoryAdapter(
             oldItem: SubCategoryTable,
             newItem: SubCategoryTable
         ): Boolean {
-            return oldItem.subCategoryId == newItem.subCategoryId && oldItem.text == newItem.text
+            return oldItem.id == newItem.id && oldItem.text == newItem.text && oldItem.backGroundColor == newItem.backGroundColor
         }
 
         override fun areContentsTheSame(
             oldItem: SubCategoryTable,
             newItem: SubCategoryTable
         ): Boolean {
-            return oldItem.subCategoryId == newItem.subCategoryId && oldItem.text == newItem.text
+            return oldItem.id == newItem.id && oldItem.text == newItem.text && oldItem.backGroundColor == newItem.backGroundColor
         }
     }
 ) {
     var searchMenuClosed: Boolean = true
-    private var tooltip: Tooltip? = null
+    var tooltip: Tooltip? = null
     var allListData = ArrayList<SubCategoryTable?>()
     private var showAddAllMenuIcon = false
+    private var showMoreOption = true
     private var showRemoveAllMenuIcon = false
     var cardViewList = ArrayList<CircularRevealCardView?>()
-    private var actionMode: ActionMode? = null
+    var actionMode: ActionMode? = null
     private var multiSelect = false
-    private var showMoreOption = true
     private val selectedItems = ArrayList<SubCategoryTable?>()
     override fun createBinding(parent: ViewGroup): AdapterSubCategoryBinding {
 
@@ -86,13 +92,193 @@ class SubCategoryAdapter(
 
     override fun bind(binding: AdapterSubCategoryBinding, item: SubCategoryTable, position: Int) {
         binding.data = item
+        Logger.e(Thread.currentThread(), "color code background  ${item.backGroundColor}")
+
+        if (backGroundColor != "-1" && backGroundColor != "default") {
+            when (backGroundColor) {
+                "green" -> {
+                    Logger.e(Thread.currentThread(), "color code green is ${item.backGroundColor}")
+                    binding.cv.strokeColor =
+                        ContextCompat.getColor(context, android.R.color.transparent)
+                    binding.cv.strokeWidth = 0
+                    binding.cv.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            android.R.color.holo_green_dark
+                        )
+                    )
+
+                    binding.text.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+
+                    binding.dateText.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+
+                }
+
+                "gray" -> {
+                    Logger.e(Thread.currentThread(), "color code gray is ${item.backGroundColor}")
+                    binding.cv.strokeColor =
+                        ContextCompat.getColor(context, R.color.transparent)
+                    binding.cv.strokeWidth = 0
+                    binding.cv.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.red
+                        )
+                    )
+                    binding.text.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+
+                    binding.dateText.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+                }
+
+                else -> {
+                    Logger.e(
+                        Thread.currentThread(),
+                        "color code default is ${item.backGroundColor}"
+                    )
+                    binding.cv.strokeColor =
+                        ContextCompat.getColor(context, android.R.color.transparent)
+                    binding.cv.strokeWidth = 0
+                    binding.cv.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+
+                    binding.text.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.black
+                        )
+                    )
+
+                    binding.dateText.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.black
+                        )
+                    )
+                }
+            }
+        } else {
+            when (item.backGroundColor) {
+                "green" -> {
+                    Logger.e(Thread.currentThread(), "color code green is ${item.backGroundColor}")
+                    binding.cv.strokeColor =
+                        ContextCompat.getColor(context, android.R.color.transparent)
+                    binding.cv.strokeWidth = 0
+                    binding.cv.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            android.R.color.holo_green_dark
+                        )
+                    )
+
+                    binding.text.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+
+                    binding.dateText.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+
+                }
+
+                "gray" -> {
+                    Logger.e(Thread.currentThread(), "color code gray is ${item.backGroundColor}")
+                    binding.cv.strokeColor =
+                        ContextCompat.getColor(context, R.color.transparent)
+                    binding.cv.strokeWidth = 0
+                    binding.cv.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.red
+                        )
+                    )
+                    binding.text.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+
+                    binding.dateText.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+                }
+
+                else -> {
+                    Logger.e(
+                        Thread.currentThread(),
+                        "color code default is ${item.backGroundColor}"
+                    )
+                    binding.cv.strokeColor =
+                        ContextCompat.getColor(context, android.R.color.transparent)
+                    binding.cv.strokeWidth = 0
+                    binding.cv.setCardBackgroundColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.white
+                        )
+                    )
+
+                    binding.text.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.black
+                        )
+                    )
+
+                    binding.dateText.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.black
+                        )
+                    )
+                }
+            }
+        }
+
 
         if (cardViewList.size > 0) cardViewList.clear()
         repeat(allListData.size) {
             cardViewList.add(binding.cv)
         }
+        update(
+            binding.data,
+            binding,
+            allListData
+        )
 
-        update(binding.data, binding)
     }
 
     inner class ActionModeCallback : ActionMode.Callback {
@@ -107,33 +293,50 @@ class SubCategoryAdapter(
                         context = context,
                         data = null,
                         title = "Selected notes will be deleted",
-                        homeSpaceData = listOf(),
+                        subCategoryData = selectedItems,
                         action = ACTION_DELETE,
                         typeOfDataToDelete = SUB_CATEGORY_LIST_DATA,
                         dataBindingComponent = dataBindingComponent,
                         onDeleteCallback = this@SubCategoryAdapter::onDeleteCallback,
                         onHomeSpaceDeleteCallback = this@SubCategoryAdapter::onHomeSpaceDeleteCallback,
-                        onSubCategoryListDeleteCallback = this@SubCategoryAdapter::onSubCategoryListDeleteCallback,
-                        onCancelCallback = this@SubCategoryAdapter::onCancelCallback
+                        onCancelCallback = this@SubCategoryAdapter::onCancelCallback,
+                        onSubCategoryListDeleteCallback = this@SubCategoryAdapter::onSubCategoryListDeleteCallback
                     ).show()
                 }
 
-                R.id.menuAddAll -> {
+                R.id.markAsPending -> {
+                    callback?.invoke(selectedItems, ACTION_MARK_AS_PENDING, "gray")
+                    mode?.finish()
+                }
+
+
+                R.id.markAsInProgress -> {
+                    callback?.invoke(selectedItems, ACTION_MARK_AS_PROGRESS, "default")
+                    mode?.finish()
+                }
+
+
+                R.id.markAsFinish -> {
+                    callback?.invoke(selectedItems, ACTION_MARK_AS_DONE, "green")
                     mode?.finish()
                 }
 
                 R.id.copy -> {
-                    callback?.invoke(selectedItems, ACTION_COPY)
+                    callback?.invoke(selectedItems, ACTION_COPY, "default")
                     mode?.finish()
                 }
 
                 R.id.edit -> {
-                    callback?.invoke(selectedItems, ACTION_EDIT)
+                    callback?.invoke(selectedItems, ACTION_EDIT, "default")
                     mode?.finish()
                 }
 
                 R.id.menuShare -> {
-                    callback?.invoke(selectedItems, ACTION_SHARE)
+                    callback?.invoke(selectedItems, ACTION_SHARE, "default")
+                    mode?.finish()
+                }
+
+                R.id.menuAddAll -> {
                     mode?.finish()
                 }
 
@@ -143,7 +346,7 @@ class SubCategoryAdapter(
                     if (!allListData.isNullOrEmpty()) {
                         selectedItems.clear()
                         allListData.zip(cardViewList) { data, cv ->
-                            selectItem(data, cv, ACTION_ALL)
+                            selectItem(data, cv, null, ACTION_ALL)
                         }
                         notifyDataSetChanged()
                     }
@@ -161,6 +364,10 @@ class SubCategoryAdapter(
             val inflater = mode?.menuInflater
             inflater?.inflate(R.menu.multi_select_menu, menu)
             menu?.findItem(R.id.menuAddAll)?.isVisible = false
+            Logger.e(
+                Thread.currentThread(),
+                "onCreateActionMode searchMenuClosed $searchMenuClosed"
+            )
             if (!searchMenuClosed) menu?.findItem(R.id.menuRemoveAll)?.isVisible = false
             return true
         }
@@ -169,7 +376,10 @@ class SubCategoryAdapter(
             mode: ActionMode?,
             menu: Menu?
         ): Boolean {
-//            menu?.findItem(R.id.edit)?.isVisible = false
+            Logger.e(
+                Thread.currentThread(),
+                "onPrepareActionMode searchMenuClosed $searchMenuClosed"
+            )
 
             if (searchMenuClosed) {
                 if (showAddAllMenuIcon) {
@@ -184,23 +394,25 @@ class SubCategoryAdapter(
                 menu?.findItem(R.id.menuAddAll)?.isVisible = false
             }
 
+
             if (showMoreOption) {
                 menu?.findItem(R.id.copy)?.isVisible = true
                 menu?.findItem(R.id.edit)?.isVisible = true
                 menu?.findItem(R.id.menuShare)?.isVisible = true
-                menu?.findItem(R.id.action_more)?.isVisible = true
+//                menu?.findItem(R.id.action_more)?.isVisible = true
             } else {
                 menu?.findItem(R.id.copy)?.isVisible = false
                 menu?.findItem(R.id.edit)?.isVisible = false
                 menu?.findItem(R.id.menuShare)?.isVisible = false
-                menu?.findItem(R.id.action_more)?.isVisible = false
+//                menu?.findItem(R.id.action_more)?.isVisible = false
             }
+
 
             return true
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-            callback?.invoke(listOf(SubCategoryTable()), ACTION_FAB_SHOW)
+            callback?.invoke(listOf(SubCategoryTable()), ACTION_FAB_SHOW, "default")
             multiSelect = false
             actionMode = null
             selectedItems.clear()
@@ -211,7 +423,17 @@ class SubCategoryAdapter(
         }
     }
 
-    private fun update(data: SubCategoryTable?, binding: AdapterSubCategoryBinding?) {
+
+    private fun onDeleteCallback(data: SubCategoryTable?, action: String) {
+
+    }
+
+    private fun update(
+        data: SubCategoryTable?,
+        binding: AdapterSubCategoryBinding?,
+        allListData: ArrayList<SubCategoryTable?>
+    ) {
+
         if (selectedItems.contains(data)) {
             binding?.cv?.strokeColor =
                 ContextCompat.getColor(context, R.color.app_theme_color_accent)
@@ -222,10 +444,21 @@ class SubCategoryAdapter(
                     R.color.app_theme_color
                 )
             )
-        } else {
-            binding?.cv?.strokeColor = Color.TRANSPARENT
-            binding?.cv?.strokeWidth = 0
-            binding?.cv?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+
+            binding?.text?.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.black
+                )
+            )
+
+            binding?.dateText?.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.black
+                )
+            )
+
         }
 
         Logger.e(Thread.currentThread(), "isFirstRun $isFirstRun")
@@ -233,10 +466,9 @@ class SubCategoryAdapter(
         if (cardViewList.isNotEmpty() && cardViewList.size == 1 && isFirstRun == true) {
             binding?.cv?.post {
                 val metrics = context.resources.displayMetrics
-
                 tooltip = Tooltip.Builder(context)
                     .anchor(binding.cv, 0, 0, true)
-                    .text("tap or long press on card to share copy, edit or delete note")
+                    .text("tap on card to add points or long press to copy, share, edit or delete it")
                     .styleId(R.style.ToolTipAltStyle)
                     .typeface(Typefaces[context, "font/roboto.ttf"])
                     .maxWidth(metrics.widthPixels / 2)
@@ -248,8 +480,8 @@ class SubCategoryAdapter(
                     .create()
 
                 tooltip?.doOnHidden {
-                        tooltip = null
-                    }
+                    tooltip = null
+                }
                     ?.doOnFailure {
 
                     }
@@ -263,41 +495,136 @@ class SubCategoryAdapter(
 
         binding?.root?.setOnClickListener {
             binding.data?.let { data ->
-                selectItem(data, binding.cv, ACTION_ROOT)
+                selectItem(data, binding.cv, binding, ACTION_ROOT)
             }
         }
         binding?.root?.setOnLongClickListener {
             val context = it.context as AppCompatActivity
             actionMode = context.startSupportActionMode(ActionModeCallback())
             binding.data?.let { data ->
-                callback?.invoke(listOf(SubCategoryTable()), ACTION_FAB_HIDE)
-                selectItem(data, binding.cv, null)
+                callback?.invoke(listOf(SubCategoryTable()), ACTION_FAB_HIDE, "default")
+                selectItem(data, binding.cv, binding, null)
             }
             return@setOnLongClickListener true
         }
-
     }
 
-    fun selectItem(data: SubCategoryTable?, cv: CircularRevealCardView?, action: String?) {
-
+    fun selectItem(
+        data: SubCategoryTable?,
+        cv: CircularRevealCardView?,
+        binding: AdapterSubCategoryBinding?,
+        action: String?
+    ) {
+        Logger.e(Thread.currentThread(), "all list data update 2 ${Gson().toJson(allListData)}")
         if (multiSelect) {
             if (selectedItems.contains(data)) {
+                Logger.e(Thread.currentThread(), "selectedItems")
                 selectedItems.remove(data)
                 cv?.strokeColor = Color.TRANSPARENT
                 cv?.strokeWidth = 0
-                cv?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+                when (data?.backGroundColor) {
+                    "green" -> {
+                        cv?.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                android.R.color.holo_green_dark
+                            )
+                        )
+
+                        binding?.text?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
+
+                        binding?.dateText?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
+
+                    }
+
+                    "gray" -> {
+                        cv?.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.red
+                            )
+                        )
+                        binding?.text?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
+
+                        binding?.dateText?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
+                    }
+
+                    else -> {
+                        cv?.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
+
+                        binding?.text?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.black
+                            )
+                        )
+
+                        binding?.dateText?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.black
+                            )
+                        )
+                    }
+                }
+
 
 
                 if (selectedItems.size == 0) {
-                    callback?.invoke(listOf(data), ACTION_FAB_SHOW)
+                    callback?.invoke(listOf(data), ACTION_FAB_SHOW, "default")
                     actionMode?.finish()
                 }
             } else {
+                Logger.e(Thread.currentThread(), "selectedItems not")
                 selectedItems.add(data)
                 cv?.strokeColor =
                     ContextCompat.getColor(context, R.color.app_theme_color_accent)
                 cv?.strokeWidth = 3
                 cv?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.app_theme_color))
+
+                Logger.e(Thread.currentThread(), "selectedItems not binding $binding")
+                Logger.e(
+                    Thread.currentThread(),
+                    "selectedItems not binding text ${binding?.text?.text}"
+                )
+                binding?.text?.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.black
+                    )
+                )
+
+                binding?.dateText?.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.black
+                    )
+                )
             }
 
             if (selectedItems.size > 0) {
@@ -326,9 +653,11 @@ class SubCategoryAdapter(
                 actionMode?.invalidate()
             }
         } else {
+//            cv?.strokeColor = Color.TRANSPARENT
+//            cv?.strokeWidth = 0
             when (action) {
                 ACTION_ROOT -> {
-                    callback?.invoke(listOf(data), ACTION_ROOT)
+                    callback?.invoke(listOf(data), ACTION_ROOT, "default")
                 }
                 null -> {
                 }
@@ -336,22 +665,21 @@ class SubCategoryAdapter(
         }
     }
 
+    private fun onHomeSpaceDeleteCallback(list: List<HomeSpaceTable?>, action: String) {
+        Logger.e(Thread.currentThread(), "onHomeSpaceDeleteCallback")
+    }
+
     private fun onCancelCallback(action: String) {
-        callback?.invoke(listOf(SubCategoryTable()), ACTION_FAB_SHOW)
+        callback?.invoke(listOf(SubCategoryTable()), ACTION_FAB_SHOW, "default")
         actionMode?.finish()
     }
+
 
     private fun onSubCategoryListDeleteCallback(list: List<SubCategoryTable?>, action: String) {
-        callback?.invoke(selectedItems, ACTION_DELETE)
+        Logger.e(Thread.currentThread(), "onSubCategoryListDeleteCallback")
+        callback?.invoke(selectedItems, ACTION_DELETE, "default")
         actionMode?.finish()
-        callback?.invoke(selectedItems, ACTION_FAB_SHOW)
+        callback?.invoke(selectedItems, ACTION_FAB_SHOW, "default")
     }
 
-    private fun onDeleteCallback(data: SubCategoryTable?, action: String) {
-
-    }
-
-    private fun onHomeSpaceDeleteCallback(list: List<HomeSpaceTable?>, action: String) {
-
-    }
 }

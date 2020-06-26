@@ -21,6 +21,7 @@ class SubCategoryViewModel @Inject constructor(
     private val callbacks: PropertyChangeRegistry by lazy { PropertyChangeRegistry() }
     var apiCall = MutableLiveData<String>()
 
+    var backGroundColor = "-1"
     override fun addOnPropertyChangedCallback(
         callback: Observable.OnPropertyChangedCallback
     ) {
@@ -68,6 +69,9 @@ class SubCategoryViewModel @Inject constructor(
         repo.deleteSubCategoryDataList(list = list)
     }
 
+    fun updateColor(list: List<SubCategoryTable?>, color: String) {
+        repo.updateBackGroundColor(list = list, color = color)
+    }
 
     fun insertSubCategory(entryId: String, data: SubCategoryTable?) {
 

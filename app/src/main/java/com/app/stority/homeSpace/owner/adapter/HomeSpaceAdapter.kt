@@ -2,6 +2,7 @@ package com.app.stority.homeSpace.owner.adapter
 
 import android.content.Context
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -10,6 +11,7 @@ import android.view.animation.Animation
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
@@ -26,6 +28,9 @@ import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTI
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_EDIT
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_HIDE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_FAB_SHOW
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_MARK_AS_DONE
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_MARK_AS_PENDING
+import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_MARK_AS_PROGRESS
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_ROOT
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_SHARE
 import com.app.stority.widget.ConfirmationDailog
@@ -34,6 +39,7 @@ import com.app.tooltip.ClosePolicy
 import com.app.tooltip.Tooltip
 import com.app.tooltip.Typefaces
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
+import com.google.gson.Gson
 
 
 class HomeSpaceAdapter(
@@ -41,18 +47,18 @@ class HomeSpaceAdapter(
     private val context: Context,
     private val dataBindingComponent: DataBindingComponent,
     val appExecutors: AppExecutors,
-    private val callback: ((List<HomeSpaceTable?>, action: String) -> Unit)?
+    private val callback: ((List<HomeSpaceTable?>, action: String, color: String) -> Unit)?
 
 
 ) : DataBoundListAdapter<HomeSpaceTable, AdapterHomeSpaceBinding>(
     appExecutors = appExecutors,
     diffCallback = object : DiffUtil.ItemCallback<HomeSpaceTable>() {
         override fun areItemsTheSame(oldItem: HomeSpaceTable, newItem: HomeSpaceTable): Boolean {
-            return oldItem.id == newItem.id && oldItem.text == newItem.text
+            return oldItem.id == newItem.id && oldItem.text == newItem.text && oldItem.backGroundColor == newItem.backGroundColor
         }
 
         override fun areContentsTheSame(oldItem: HomeSpaceTable, newItem: HomeSpaceTable): Boolean {
-            return oldItem.id == newItem.id && oldItem.text == newItem.text
+            return oldItem.id == newItem.id && oldItem.text == newItem.text && oldItem.backGroundColor == newItem.backGroundColor
         }
     }
 ) {
@@ -63,7 +69,7 @@ class HomeSpaceAdapter(
     private var showMoreOption = true
     private var showRemoveAllMenuIcon = false
     var cardViewList = ArrayList<CircularRevealCardView?>()
-    private var actionMode: ActionMode? = null
+    var actionMode: ActionMode? = null
     private var multiSelect = false
     private val selectedItems = ArrayList<HomeSpaceTable?>()
     override fun createBinding(parent: ViewGroup): AdapterHomeSpaceBinding {
@@ -80,13 +86,100 @@ class HomeSpaceAdapter(
 
     override fun bind(binding: AdapterHomeSpaceBinding, item: HomeSpaceTable, position: Int) {
         binding.data = item
+        Logger.e(Thread.currentThread(), "color code background  ${item.backGroundColor}")
+        when (item.backGroundColor) {
+            "green" -> {
+                Logger.e(Thread.currentThread(), "color code green is ${item.backGroundColor}")
+                binding.cv.strokeColor =
+                    ContextCompat.getColor(context, android.R.color.transparent)
+                binding.cv.strokeWidth = 0
+                binding.cv.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        context,
+                        android.R.color.holo_green_dark
+                    )
+                )
+
+                binding.text.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.white
+                    )
+                )
+
+                binding.dateText.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.white
+                    )
+                )
+
+            }
+
+            "gray" -> {
+                Logger.e(Thread.currentThread(), "color code gray is ${item.backGroundColor}")
+                binding.cv.strokeColor =
+                    ContextCompat.getColor(context, R.color.transparent)
+                binding.cv.strokeWidth = 0
+                binding.cv.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.red
+                    )
+                )
+                binding.text.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.white
+                    )
+                )
+
+                binding.dateText.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.white
+                    )
+                )
+            }
+
+            else -> {
+                Logger.e(Thread.currentThread(), "color code default is ${item.backGroundColor}")
+                binding.cv.strokeColor =
+                    ContextCompat.getColor(context, android.R.color.transparent)
+                binding.cv.strokeWidth = 0
+                binding.cv.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.white
+                    )
+                )
+
+                binding.text.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.black
+                    )
+                )
+
+                binding.dateText.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.black
+                    )
+                )
+            }
+        }
 
         if (cardViewList.size > 0) cardViewList.clear()
         repeat(allListData.size) {
             cardViewList.add(binding.cv)
         }
+        update(
+            binding.data,
+            binding,
+            allListData
+        )
 
-        update(binding.data, binding)
     }
 
     inner class ActionModeCallback : ActionMode.Callback {
@@ -112,18 +205,33 @@ class HomeSpaceAdapter(
                     ).show()
                 }
 
+                R.id.markAsPending -> {
+                    callback?.invoke(selectedItems, ACTION_MARK_AS_PENDING, "gray")
+                    mode?.finish()
+                }
+
+                R.id.markAsFinish -> {
+                    callback?.invoke(selectedItems, ACTION_MARK_AS_DONE, "green")
+                    mode?.finish()
+                }
+
+                R.id.markAsInProgress -> {
+                    callback?.invoke(selectedItems, ACTION_MARK_AS_PROGRESS, "default")
+                    mode?.finish()
+                }
+
                 R.id.copy -> {
-                    callback?.invoke(selectedItems, ACTION_COPY)
+                    callback?.invoke(selectedItems, ACTION_COPY, "default")
                     mode?.finish()
                 }
 
                 R.id.edit -> {
-                    callback?.invoke(selectedItems, ACTION_EDIT)
+                    callback?.invoke(selectedItems, ACTION_EDIT, "default")
                     mode?.finish()
                 }
 
                 R.id.menuShare -> {
-                    callback?.invoke(selectedItems, ACTION_SHARE)
+                    callback?.invoke(selectedItems, ACTION_SHARE, "default")
                     mode?.finish()
                 }
 
@@ -137,7 +245,7 @@ class HomeSpaceAdapter(
                     if (!allListData.isNullOrEmpty()) {
                         selectedItems.clear()
                         allListData.zip(cardViewList) { data, cv ->
-                            selectItem(data, cv, ACTION_ALL)
+                            selectItem(data, cv, null, ACTION_ALL)
                         }
                         notifyDataSetChanged()
                     }
@@ -190,12 +298,12 @@ class HomeSpaceAdapter(
                 menu?.findItem(R.id.copy)?.isVisible = true
                 menu?.findItem(R.id.edit)?.isVisible = true
                 menu?.findItem(R.id.menuShare)?.isVisible = true
-                menu?.findItem(R.id.action_more)?.isVisible = true
+//                menu?.findItem(R.id.action_more)?.isVisible = true
             } else {
                 menu?.findItem(R.id.copy)?.isVisible = false
                 menu?.findItem(R.id.edit)?.isVisible = false
                 menu?.findItem(R.id.menuShare)?.isVisible = false
-                menu?.findItem(R.id.action_more)?.isVisible = false
+//                menu?.findItem(R.id.action_more)?.isVisible = false
             }
 
 
@@ -203,7 +311,7 @@ class HomeSpaceAdapter(
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
-            callback?.invoke(listOf(HomeSpaceTable()), ACTION_FAB_SHOW)
+            callback?.invoke(listOf(HomeSpaceTable()), ACTION_FAB_SHOW, "default")
             multiSelect = false
             actionMode = null
             selectedItems.clear()
@@ -219,7 +327,12 @@ class HomeSpaceAdapter(
 
     }
 
-    private fun update(data: HomeSpaceTable?, binding: AdapterHomeSpaceBinding?) {
+    private fun update(
+        data: HomeSpaceTable?,
+        binding: AdapterHomeSpaceBinding?,
+        allListData: ArrayList<HomeSpaceTable?>
+    ) {
+
         if (selectedItems.contains(data)) {
             binding?.cv?.strokeColor =
                 ContextCompat.getColor(context, R.color.app_theme_color_accent)
@@ -230,10 +343,21 @@ class HomeSpaceAdapter(
                     R.color.app_theme_color
                 )
             )
-        } else {
-            binding?.cv?.strokeColor = Color.TRANSPARENT
-            binding?.cv?.strokeWidth = 0
-            binding?.cv?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+
+            binding?.text?.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.black
+                )
+            )
+
+            binding?.dateText?.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.black
+                )
+            )
+
         }
 
         Logger.e(Thread.currentThread(), "isFirstRun $isFirstRun")
@@ -255,8 +379,8 @@ class HomeSpaceAdapter(
                     .create()
 
                 tooltip?.doOnHidden {
-                        tooltip = null
-                    }
+                    tooltip = null
+                }
                     ?.doOnFailure {
 
                     }
@@ -270,40 +394,136 @@ class HomeSpaceAdapter(
 
         binding?.root?.setOnClickListener {
             binding.data?.let { data ->
-                selectItem(data, binding.cv, ACTION_ROOT)
+                selectItem(data, binding.cv, binding, ACTION_ROOT)
             }
         }
         binding?.root?.setOnLongClickListener {
             val context = it.context as AppCompatActivity
             actionMode = context.startSupportActionMode(ActionModeCallback())
             binding.data?.let { data ->
-                callback?.invoke(listOf(HomeSpaceTable()), ACTION_FAB_HIDE)
-                selectItem(data, binding.cv, null)
+                callback?.invoke(listOf(HomeSpaceTable()), ACTION_FAB_HIDE, "default")
+                selectItem(data, binding.cv, binding, null)
             }
             return@setOnLongClickListener true
         }
     }
 
-    fun selectItem(data: HomeSpaceTable?, cv: CircularRevealCardView?, action: String?) {
-
+    fun selectItem(
+        data: HomeSpaceTable?,
+        cv: CircularRevealCardView?,
+        binding: AdapterHomeSpaceBinding?,
+        action: String?
+    ) {
+        Logger.e(Thread.currentThread(), "all list data update 2 ${Gson().toJson(allListData)}")
         if (multiSelect) {
             if (selectedItems.contains(data)) {
+                Logger.e(Thread.currentThread(), "selectedItems")
                 selectedItems.remove(data)
                 cv?.strokeColor = Color.TRANSPARENT
                 cv?.strokeWidth = 0
-                cv?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+                when (data?.backGroundColor) {
+                    "green" -> {
+                        cv?.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                android.R.color.holo_green_dark
+                            )
+                        )
+
+                        binding?.text?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
+
+                        binding?.dateText?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
+
+                    }
+
+                    "gray" -> {
+                        cv?.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.red
+                            )
+                        )
+                        binding?.text?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
+
+                        binding?.dateText?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
+                    }
+
+                    else -> {
+                        cv?.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
+
+                        binding?.text?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.black
+                            )
+                        )
+
+                        binding?.dateText?.setTextColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.black
+                            )
+                        )
+                    }
+                }
+
 
 
                 if (selectedItems.size == 0) {
-                    callback?.invoke(listOf(data), ACTION_FAB_SHOW)
+                    callback?.invoke(listOf(data), ACTION_FAB_SHOW, "default")
                     actionMode?.finish()
                 }
             } else {
+                Logger.e(Thread.currentThread(), "selectedItems not")
                 selectedItems.add(data)
                 cv?.strokeColor =
                     ContextCompat.getColor(context, R.color.app_theme_color_accent)
                 cv?.strokeWidth = 3
                 cv?.setCardBackgroundColor(ContextCompat.getColor(context, R.color.app_theme_color))
+
+                Logger.e(Thread.currentThread(), "selectedItems not binding $binding")
+                Logger.e(
+                    Thread.currentThread(),
+                    "selectedItems not binding text ${binding?.text?.text}"
+                )
+                binding?.text?.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.black
+                    )
+                )
+
+                binding?.dateText?.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.black
+                    )
+                )
             }
 
             if (selectedItems.size > 0) {
@@ -332,9 +552,11 @@ class HomeSpaceAdapter(
                 actionMode?.invalidate()
             }
         } else {
+//            cv?.strokeColor = Color.TRANSPARENT
+//            cv?.strokeWidth = 0
             when (action) {
                 ACTION_ROOT -> {
-                    callback?.invoke(listOf(data), ACTION_ROOT)
+                    callback?.invoke(listOf(data), ACTION_ROOT, "default")
                 }
                 null -> {
                 }
@@ -343,13 +565,13 @@ class HomeSpaceAdapter(
     }
 
     private fun onHomeSpaceDeleteCallback(list: List<HomeSpaceTable?>, action: String) {
-        callback?.invoke(selectedItems, ACTION_DELETE)
+        callback?.invoke(selectedItems, ACTION_DELETE, "default")
         actionMode?.finish()
-        callback?.invoke(selectedItems, ACTION_FAB_SHOW)
+        callback?.invoke(selectedItems, ACTION_FAB_SHOW, "default")
     }
 
     private fun onCancelCallback(action: String) {
-        callback?.invoke(listOf(HomeSpaceTable()), ACTION_FAB_SHOW)
+        callback?.invoke(listOf(HomeSpaceTable()), ACTION_FAB_SHOW, "default")
         actionMode?.finish()
     }
 

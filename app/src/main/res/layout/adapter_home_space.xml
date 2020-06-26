@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tool="http://schemas.android.com/tools">
-
     <data>
-
         <variable
             name="data"
             type="com.app.stority.homeSpace.data.HomeSpaceTable" />
@@ -17,10 +16,10 @@
         android:layout_margin="6dp"
         android:animateLayoutChanges="true"
         android:minHeight="110dp"
-        app:cardBackgroundColor="@color/card_color"
         app:cardCornerRadius="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintWidth_default="percent"
@@ -41,7 +40,6 @@
                 android:paddingEnd="15dp"
                 android:paddingRight="15dp"
                 android:text='@{data.text==null ? "N/A" : data.text}'
-                android:textColor="?attr/colorOnBackground"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toTopOf="@id/date_text"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +60,6 @@
                 android:paddingRight="20dp"
                 android:paddingBottom="15dp"
                 android:singleLine="true"
-                android:textColor="?attr/colorOnBackground"
                 android:textStyle="normal"
                 app:format="@{@string/custom_date}"
                 app:layout_constraintBottom_toBottomOf="parent"

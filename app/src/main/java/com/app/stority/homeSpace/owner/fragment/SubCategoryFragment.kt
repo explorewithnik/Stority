@@ -32,7 +32,6 @@ import com.app.stority.homeSpace.observer.SubCategoryViewModel
 import com.app.stority.homeSpace.owner.activity.HomeSpaceActivity
 import com.app.stority.homeSpace.owner.activity.HomeSpaceActivity.Companion.FIRST_TIME_LAUNCH_2
 import com.app.stority.homeSpace.owner.adapter.SubCategoryAdapter
-import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.ACTION_EDIT
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.GRID_TYPE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.LINEAR_TYPE
 import com.app.stority.homeSpace.owner.fragment.HomeSpaceFragment.Companion.LIST_TYPE
@@ -67,6 +66,7 @@ class SubCategoryFragment : Fragment(), Injectable {
     private var searchMenuClosed = true
 
     private var entryId = ""
+    private var backGroundColor = "-1"
     private var fromSearch: Boolean = false
     private var text = ""
     private var shouldHideSearchList: Boolean = true
@@ -77,6 +77,9 @@ class SubCategoryFragment : Fragment(), Injectable {
         shouldHideSearchList = true
         entryId = savedInstanceState?.getString(entryId)
             ?: SubCategoryFragmentArgs.fromBundle(arguments!!).entryId
+
+        backGroundColor = savedInstanceState?.getString(backGroundColor)
+            ?: SubCategoryFragmentArgs.fromBundle(arguments!!).backGroundColor
 
         fromSearch = savedInstanceState?.getBoolean(fromSearch.toString())
             ?: SubCategoryFragmentArgs.fromBundle(arguments!!).fromSearch
@@ -107,17 +110,19 @@ class SubCategoryFragment : Fragment(), Injectable {
             Logger.e(Thread.currentThread(), "elseee")
         }
 
+
         val stopAnim = viewModel.init(entryId)
         if (stopAnim) isFirstRun =
             false //stopping tooltip anim when coming back from sub category frag
 
         adapter = SubCategoryAdapter(
+            backGroundColor = backGroundColor,
             isFirstRun = isFirstRun,
             context = requireContext(),
             dataBindingComponent = dataBindingComponent,
             appExecutors = executors
 
-        ) { listData, action ->
+        ) { listData, action, color ->
             when (action) {
 
                 ACTION_ROOT -> {
@@ -148,6 +153,18 @@ class SubCategoryFragment : Fragment(), Injectable {
 
                 ACTION_FAB_HIDE -> {
                     binding.fab.hide()
+                }
+
+                ACTION_MARK_AS_DONE -> {
+                    viewModel.updateColor(list = listData, color = color)
+                }
+
+                ACTION_MARK_AS_PENDING -> {
+                    viewModel.updateColor(list = listData, color = color)
+                }
+
+                ACTION_MARK_AS_PROGRESS -> {
+                    viewModel.updateColor(list = listData, color = color)
                 }
 
                 ACTION_EDIT -> {
@@ -456,7 +473,9 @@ class SubCategoryFragment : Fragment(), Injectable {
         const val ACTION_MORE = "more"
         const val ACTION_MORE_INT = 2
         const val ACTION_RENAME = 1
-
+        const val ACTION_MARK_AS_DONE = "done"
+        const val ACTION_MARK_AS_PENDING = "pending"
+        const val ACTION_MARK_AS_PROGRESS = "progress"
         const val ACTION_COPY = "copy"
         const val ACTION_DELETE = "delete"
         const val ACTION_SHARE = "share"
@@ -624,8 +643,8 @@ class SubCategoryFragment : Fragment(), Injectable {
                     .create()
 
                 tooltip?.doOnHidden {
-                        tooltip = null
-                    }
+                    tooltip = null
+                }
                     ?.doOnFailure {
 
                     }

@@ -106,6 +106,17 @@ class HomeSpaceRepository @Inject constructor(
         }
     }
 
+    fun updateBackGroundColor(
+        list: List<HomeSpaceTable?>,
+        color: String
+    ) {
+        list.forEach {
+            executor.diskIO().execute {
+                dao.updateCardColor(id = it?.id, color = color)
+            }
+        }
+    }
+
     fun fetchSubCategoryDataList(
         shouldFetch: Boolean,
         id: String?
