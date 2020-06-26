@@ -362,7 +362,7 @@ class SubCategoryAdapter(
         ): Boolean {
             multiSelect = true
             val inflater = mode?.menuInflater
-            inflater?.inflate(R.menu.multi_select_menu, menu)
+            inflater?.inflate(R.menu.multi_select_menu_subcate, menu)
             menu?.findItem(R.id.menuAddAll)?.isVisible = false
             Logger.e(
                 Thread.currentThread(),

@@ -92,6 +92,6 @@
     <string name="no_note_available">No note available !</string>
     <string name="no_data_available">No data available !</string>
     <string name="mark_as_done">mark as done</string>
-    <string name="mark_as_progress">mark as progress</string>
+    <string name="mark_as_progress">mark as in-progress</string>
     <string name="mark_as_pending">mark as pending</string>
 </resources>
