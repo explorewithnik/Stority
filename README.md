@@ -21,3 +21,5 @@ It's a note taking application with Kotlin, Java, dagger 2 , MVVM Architecture, 
 6. Built on MVVM Architecture
 7. Room DB
 8. Dagger injection
+9. Binding Adapter
+10.Two-Way Databinding
