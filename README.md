@@ -12,7 +12,7 @@ It's a note taking application with Kotlin, Java, dagger 2 , MVVM Architecture, 
 <img src="https://user-images.githubusercontent.com/66737766/85917506-27b54980-b878-11ea-8040-b88483b60bf9.jpg" width="200" height="300"/>
 
 
-### Features
+### Features and Technologies
 1. Notes and sub notes
 2. Multi delete, edit notes
 3. Marks categories/sub-categories pending, done or in-progress
