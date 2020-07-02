@@ -396,7 +396,7 @@ class SubCategoryFragment : Fragment(), Injectable {
                 } else {
                     newText?.let { queryData ->
                         searchList = adapter.allListData.filter {
-                            it?.text?.startsWith(queryData, true) ?: false
+                            it?.text?.contains(queryData, true) ?: false
                         }.toMutableList()
 
                         Logger.e(Thread.currentThread(), "list ${Gson().toJson(searchList)}")

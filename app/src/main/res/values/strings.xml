@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Home Space</string>
+    <string name="app_name">Stority</string>
     <string name="filled_bullet"> \u25CF</string>
 
 
@@ -45,7 +45,7 @@
     <string name="delete_data_message">This note will be deleted</string>
     <string name="select_all">Select All</string>
     <string name="add_menu_title">Add</string>
-    <string name="home_space">Home Space</string>
+    <string name="home_space">Stority</string>
     <string name="add_data_dialog_title">New Category</string>
     <string name="add_sub_category_data_dialog_title">Add Note</string>
     <string name="add_sub_category_data_dialog">Note</string>
